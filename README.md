@@ -28,68 +28,6 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 - Tailwind CSS for styling
 - Axios for API calls
 
-## Project Structure
-
-\`\`\`
-fittrack/
-├── client/                 # React frontend
-│   ├── src/
-│   │   ├── components/     # Reusable UI components
-│   │   ├── pages/          # Page components
-│   │   ├── context/        # React context (Auth)
-│   │   ├── hooks/          # Custom hooks
-│   │   ├── services/       # API service functions
-│   │   └── utils/          # Utility functions
-│   └── package.json
-│
-├── server/                 # Express backend
-│   ├── config/             # Database configuration
-│   ├── controllers/        # Route controllers
-│   ├── middleware/         # Auth middleware
-│   ├── models/             # Mongoose schemas
-│   ├── routes/             # API routes
-│   └── package.json
-│
-└── README.md
-\`\`\`
-
-## Getting Started
-
-### Prerequisites
-- Node.js (v18 or higher)
-- MongoDB (local or Atlas)
-- npm or yarn
-
-### Installation
-
-1. **Clone the repository**
-\`\`\`bash
-git clone <repository-url>
-cd fittrack
-\`\`\`
-
-2. **Setup Backend**
-\`\`\`bash
-cd server
-npm install
-cp .env.example .env
-# Edit .env with your MongoDB URI and JWT secret
-npm run dev
-\`\`\`
-
-3. **Setup Frontend**
-\`\`\`bash
-cd client
-npm install
-cp .env.example .env
-# Edit .env if needed (API URL)
-npm run dev
-\`\`\`
-
-4. **Access the application**
-- Frontend: http://localhost:5173
-- Backend API: http://localhost:5000
-
 ## API Endpoints
 
 ### Authentication
@@ -130,21 +68,6 @@ npm run dev
 ### Reports
 - `GET /api/reports/summary` - Get comprehensive report
 - `GET /api/reports/weekly` - Get weekly breakdown
-
-## Environment Variables
-
-### Server (.env)
-\`\`\`
-PORT=5000
-MONGODB_URI=mongodb://localhost:27017/fittrack
-JWT_SECRET=your_secret_key
-JWT_EXPIRE=7d
-\`\`\`
-
-### Client (.env)
-\`\`\`
-VITE_API_URL=http://localhost:5000/api
-\`\`\`
 
 ## License
 
