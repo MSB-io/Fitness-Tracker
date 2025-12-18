@@ -73,11 +73,11 @@ or
 };
 
 function App() {
-  const { user } = useAuth();
+  const { user } = useAuth(); // Get current user from AuthContext
 
   return (
     <Routes>
-      {/* Auth Routes */}
+      {/* Auth Routes - wrapping login and register with AuthLayout */}
       <Route element={<AuthLayout />}>
         <Route
           path="/login"
@@ -89,7 +89,7 @@ function App() {
         />
       </Route>
 
-      {/* Protected User Routes */}
+      {/* Protected User Routes - wrapping with ProtectedRoute and MainLayout */}
       <Route
         element={
           <ProtectedRoute>
@@ -108,7 +108,7 @@ function App() {
         <Route path="/my-plan" element={<MyPlan />} />
       </Route>
 
-      {/* Protected Trainer Routes */}
+      {/* Protected Trainer Routes - wrapping with ProtectedRoute (allowedRoles: trainer) and MainLayout */}
       <Route
         element={
           <ProtectedRoute allowedRoles={["trainer"]}>
