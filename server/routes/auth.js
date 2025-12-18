@@ -177,11 +177,9 @@ router.post("/trainer-request", protect, async (req, res) => {
     });
 
     if (existingRequest) {
-      return res
-        .status(400)
-        .json({
-          message: "You already have a pending request to this trainer",
-        });
+      return res.status(400).json({
+        message: "You already have a pending request to this trainer",
+      });
     }
 
     // Create trainer request
