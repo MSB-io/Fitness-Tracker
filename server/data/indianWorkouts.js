@@ -241,7 +241,7 @@ export const indianWorkouts = [
     difficulty: "beginner",
     primaryMuscles: ["legs", "glutes", "cardiovascular"],
   },
-]
+];
 
 // Categorize workouts
 export const workoutsByCategory = {
@@ -250,13 +250,13 @@ export const workoutsByCategory = {
   cardio: indianWorkouts.filter((w) => w.category === "cardio"),
   sports: indianWorkouts.filter((w) => w.category === "sports"),
   dance: indianWorkouts.filter((w) => w.category === "dance"),
-}
+};
 
 export const workoutsByDifficulty = {
   beginner: indianWorkouts.filter((w) => w.difficulty === "beginner"),
   intermediate: indianWorkouts.filter((w) => w.difficulty === "intermediate"),
   advanced: indianWorkouts.filter((w) => w.difficulty === "advanced"),
-}
+};
 
 // Predefined workout plans
 export const workoutPlans = {
@@ -287,4 +287,4 @@ export const workoutPlans = {
       { name: "Stairs Climbing", duration: 5 },
     ],
   },
-}
+};

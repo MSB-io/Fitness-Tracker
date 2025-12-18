@@ -595,7 +595,7 @@ export const indianFoods = [
     foodType: "non-vegetarian",
     region: "All India",
   },
-]
+];
 
 // Categorize foods for easy filtering
 export const foodsByCategory = {
@@ -604,17 +604,17 @@ export const foodsByCategory = {
   snack: indianFoods.filter((f) => f.category === "snack"),
   dessert: indianFoods.filter((f) => f.category === "dessert"),
   beverage: indianFoods.filter((f) => f.category === "beverage"),
-}
+};
 
 export const foodsByType = {
   vegetarian: indianFoods.filter((f) => f.foodType === "vegetarian"),
   vegan: indianFoods.filter((f) => f.foodType === "vegan"),
   nonVegetarian: indianFoods.filter((f) => f.foodType === "non-vegetarian"),
-}
+};
 
 export const foodsByRegion = {
   northIndian: indianFoods.filter((f) => f.region === "North Indian"),
   southIndian: indianFoods.filter((f) => f.region === "South Indian"),
   westIndian: indianFoods.filter((f) => f.region === "Western Indian"),
   allIndia: indianFoods.filter((f) => f.region === "All India"),
-}
+};
