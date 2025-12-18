@@ -57,11 +57,12 @@ const goalSchema = new mongoose.Schema(
 );
 
 // Virtual for progress percentage
+// virtuals are not stored in MongoDB but can be accessed like normal fields
 goalSchema.virtual("progress").get(function () {
-  if (this.targetValue === 0) return 0;
-  return Math.min(100, (this.currentValue / this.targetValue) * 100);
+  if (this.targetValue === 0) return 0; // Avoid division by zero
+  return Math.min(100, (this.currentValue / this.targetValue) * 100); // Cap at 100%
 });
 
-goalSchema.set("toJSON", { virtuals: true });
+goalSchema.set("toJSON", { virtuals: true }); // Include virtuals in JSON output
 
-export default mongoose.model("Goal", goalSchema);
+export default mongoose.model("Goal", goalSchema); // Export Goal model
