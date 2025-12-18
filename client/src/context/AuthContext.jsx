@@ -45,19 +45,58 @@ export const useAuth = () => {
 }
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
+  {
+    /* user - Current logged-in user object or null
+    Initial value: null (not logged in)
+    After login:
+    {
+      _id: "abc123",
+      name: "manthan",
+      email: "msb@example.com",
+      role: "user",
+      profile: { age: 19, gender: "male", ... }
+    }
+    */
+  }
   const [loading, setLoading] = useState(true);
+  {
+    /* loading - true while checking auth status on app load
+    Initial value: true
+    After check: false
+    prevents flash of login screen
+    */
+  }
   const [error, setError] = useState(null);
+  {
+    /* error - holds any auth-related error messages */
+  }
 
+  {
+    /* 
+      Runs once when app loads to check if user is already logged in.
+      Empty dependency array [] - Runs only once on mount
+      Calls checkAuth() function
+    */
+  }
   useEffect(() => {
     checkAuth();
   }, []);
 
+  {
+    /*
+    Purpose:
+    Validates stored JWT token and restores user session.
+    */
+  }
   const checkAuth = async () => {
-    const token = localStorage.getItem("fittrack_token");
-    if (token) {
+    const token = localStorage.getItem("fittrack_token"); {/* Get token from localStorage */ }
+    if (token) { {/* If token exists, validate it */ }
       try {
+        {/* Set Authorization header for future requests */ }
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+          {/* Fetch current user data from backend */ }
         const response = await api.get("/auth/me");
+        {/* If successful, set user state */ }
         setUser(response.data);
       } catch (err) {
         localStorage.removeItem("fittrack_token");
