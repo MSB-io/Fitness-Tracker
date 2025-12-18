@@ -1,18 +1,48 @@
-"use client";
-
 import { createContext, useContext, useState, useEffect } from "react";
 import api from "../services/api";
 
+{
+  /*
+  createContext(null) - Creates context with default value null
+  This context will hold auth state and functions
+  Think of it as a "global variable" accessible anywhere
+  */
+}
 const AuthContext = createContext(null);
 
+{
+  /*
+  Purpose:
+  Custom hook to access auth context from any component.
+  */
+}
 export const useAuth = () => {
   const context = useContext(AuthContext);
+  {
+    /* useContext(AuthContext) - Reads value from nearest AuthProvider, Returns whatever is in the Provider's value prop */
+  }
+  {
+    /* prevents using useAuth() outside of <AuthProvider>, Better developer experience with clear error message */
+  }
   if (!context) {
     throw new Error("useAuth must be used within an AuthProvider");
   }
   return context;
+  {
+    /* returns the auth context value (user, login, logout, etc.) */
+  }
+  {
+    /* Returns auth state and functions
+    Components can destructure what they need */
+  }
 };
 
+{
+  /* 
+  Provider component that wraps your app
+  children - All components inside <AuthProvider> (your entire app)
+*/
+}
 export const AuthProvider = ({ children }) => {
   const [user, setUser] = useState(null);
   const [loading, setLoading] = useState(true);
