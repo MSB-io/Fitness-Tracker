@@ -68,7 +68,3 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 ### Reports
 - `GET /api/reports/summary` - Get comprehensive report
 - `GET /api/reports/weekly` - Get weekly breakdown
-
-## License
-
-MIT
