@@ -89,55 +89,123 @@ export const AuthProvider = ({ children }) => {
     */
   }
   const checkAuth = async () => {
-    const token = localStorage.getItem("fittrack_token"); {/* Get token from localStorage */ }
-    if (token) { {/* If token exists, validate it */ }
+    const token = localStorage.getItem("fittrack_token");
+    {
+      /* Get token from localStorage */
+    }
+    if (token) {
+      {
+        /* If token exists, validate it */
+      }
       try {
-        {/* Set Authorization header for future requests */ }
+        {
+          /* Set Authorization header for future requests */
+        }
         api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
-          {/* Fetch current user data from backend */ }
+        {
+          /* Fetch current user data from backend */
+        }
         const response = await api.get("/auth/me");
-        {/* If successful, set user state */ }
+        {
+          /* If successful, set user state */
+        }
         setUser(response.data);
       } catch (err) {
         localStorage.removeItem("fittrack_token");
         delete api.defaults.headers.common["Authorization"];
       }
     }
-    {/* After check (regardless of outcome), set loading to false */ }
+    {
+      /* After check (regardless of outcome), set loading to false */
+    }
     setLoading(false);
   };
 
+  {
+    /*
+      Purpose:
+      Logs in user with email and password.
+      On success, stores token and user data.
+      On failure, sets error message.
+     */
+  }
   const login = async (email, password) => {
     try {
+      {
+        /* Clear previous errors */
+      }
       setError(null);
+      {
+        /* Send login request to backend */
+      }
       const response = await api.post("/auth/login", { email, password });
+      {
+        /* Destructure token and user data from response */
+      }
       const { token, ...userData } = response.data;
-
+      {
+        /* Store token in localStorage for persistence */
+      }
       localStorage.setItem("fittrack_token", token);
+      {
+        /* Set Authorization header for future requests */
+      }
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      {
+        /* Update user state with logged-in user data */
+      }
       setUser(userData);
 
       return { success: true };
     } catch (err) {
+      {
+        /* On error, extract message and set error state */
+      }
       const message = err.response?.data?.message || "Login failed";
       setError(message);
       return { success: false, error: message };
     }
   };
 
+  {
+    /*
+    Purpose:
+    Registers a new user with name, email, password, and role.
+    On success, stores token and user data.
+    On failure, sets error message.
+    */
+  }
   const register = async (name, email, password, role = "user") => {
     try {
+      {
+        /* Clear previous errors */
+      }
       setError(null);
+      {
+        /* Send registration request to backend */
+      }
       const response = await api.post("/auth/register", {
         name,
         email,
         password,
         role,
       });
+      {
+        /* Destructure token and user data from response */
+      }
       const { token, ...userData } = response.data;
 
+      {
+        /* Store token in localStorage for persistence */
+      }
       localStorage.setItem("fittrack_token", token);
+      {
+        /* Set Authorization header for future requests */
+      }
       api.defaults.headers.common["Authorization"] = `Bearer ${token}`;
+      {
+        /* Update user state with registered user data */
+      }
       setUser(userData);
 
       return { success: true };
@@ -151,15 +219,35 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  {
+    /*
+    Purpose:
+    Logs out the current user by clearing token and user data.
+    */
+  }
   const logout = () => {
     localStorage.removeItem("fittrack_token");
     delete api.defaults.headers.common["Authorization"];
     setUser(null);
   };
 
+  {
+    /*
+    Purpose:
+    Updates the user's profile information.
+    On success, updates user state.
+    On failure, returns error message.
+    */
+  }
   const updateProfile = async (data) => {
     try {
+      {
+        /* Send profile update request to backend */
+      }
       const response = await api.put("/auth/profile", data);
+      {
+        /* On success, update user state with new profile data, this happens on client side so that the user see's the effect quickly. */
+      }
       setUser(response.data);
       return { success: true };
     } catch (err) {
@@ -168,6 +256,15 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  {
+    /*
+    Purpose:
+    Refreshes the current user's data from the backend.
+    On success, updates user state.
+    On failure, returns error message.
+    eg, if user updated their profile in another tab, this fetches the latest data.
+     */
+  }
   const refreshUser = async () => {
     try {
       const response = await api.get("/auth/me");
@@ -180,6 +277,12 @@ export const AuthProvider = ({ children }) => {
     }
   };
 
+  {
+    /*
+    Provides auth state and functions to child components
+    isTrainer - convenience boolean to check if user is a trainer
+    */
+  }
   return (
     <AuthContext.Provider
       value={{
