@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const weightLogSchema = new mongoose.Schema(
   {
@@ -22,7 +22,7 @@ const weightLogSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-export default mongoose.model("WeightLog", weightLogSchema)
+export default mongoose.model("WeightLog", weightLogSchema);

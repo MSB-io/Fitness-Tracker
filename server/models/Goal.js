@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const goalSchema = new mongoose.Schema(
   {
@@ -9,7 +9,15 @@ const goalSchema = new mongoose.Schema(
     },
     type: {
       type: String,
-      enum: ["weight_loss", "weight_gain", "muscle_gain", "endurance", "strength", "flexibility", "custom"],
+      enum: [
+        "weight_loss",
+        "weight_gain",
+        "muscle_gain",
+        "endurance",
+        "strength",
+        "flexibility",
+        "custom",
+      ],
       required: true,
     },
     title: {
@@ -45,15 +53,15 @@ const goalSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
 // Virtual for progress percentage
 goalSchema.virtual("progress").get(function () {
-  if (this.targetValue === 0) return 0
-  return Math.min(100, (this.currentValue / this.targetValue) * 100)
-})
+  if (this.targetValue === 0) return 0;
+  return Math.min(100, (this.currentValue / this.targetValue) * 100);
+});
 
-goalSchema.set("toJSON", { virtuals: true })
+goalSchema.set("toJSON", { virtuals: true });
 
-export default mongoose.model("Goal", goalSchema)
+export default mongoose.model("Goal", goalSchema);

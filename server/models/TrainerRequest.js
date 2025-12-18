@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const trainerRequestSchema = new mongoose.Schema(
   {
@@ -29,11 +29,11 @@ const trainerRequestSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
 // Index for faster queries
-trainerRequestSchema.index({ user: 1, trainer: 1 })
-trainerRequestSchema.index({ trainer: 1, status: 1 })
+trainerRequestSchema.index({ user: 1, trainer: 1 });
+trainerRequestSchema.index({ trainer: 1, status: 1 });
 
-export default mongoose.model("TrainerRequest", trainerRequestSchema)
+export default mongoose.model("TrainerRequest", trainerRequestSchema);

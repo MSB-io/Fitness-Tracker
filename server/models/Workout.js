@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const exerciseSchema = new mongoose.Schema({
   name: {
@@ -7,7 +7,17 @@ const exerciseSchema = new mongoose.Schema({
   },
   category: {
     type: String,
-    enum: ["cardio", "strength", "flexibility", "balance", "yoga", "traditional", "sports", "dance", "other"],
+    enum: [
+      "cardio",
+      "strength",
+      "flexibility",
+      "balance",
+      "yoga",
+      "traditional",
+      "sports",
+      "dance",
+      "other",
+    ],
     default: "other",
   },
   sets: Number,
@@ -16,7 +26,7 @@ const exerciseSchema = new mongoose.Schema({
   duration: Number, // in minutes (for cardio)
   distance: Number, // in km (for cardio)
   caloriesBurned: Number,
-})
+});
 
 const workoutSchema = new mongoose.Schema(
   {
@@ -46,7 +56,7 @@ const workoutSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-export default mongoose.model("Workout", workoutSchema)
+export default mongoose.model("Workout", workoutSchema);

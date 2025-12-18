@@ -1,9 +1,17 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const workoutPlanDaySchema = new mongoose.Schema({
   day: {
     type: String,
-    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+    enum: [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ],
   },
   exercises: [
     {
@@ -19,12 +27,20 @@ const workoutPlanDaySchema = new mongoose.Schema({
     type: Boolean,
     default: false,
   },
-})
+});
 
 const mealPlanDaySchema = new mongoose.Schema({
   day: {
     type: String,
-    enum: ["monday", "tuesday", "wednesday", "thursday", "friday", "saturday", "sunday"],
+    enum: [
+      "monday",
+      "tuesday",
+      "wednesday",
+      "thursday",
+      "friday",
+      "saturday",
+      "sunday",
+    ],
   },
   meals: [
     {
@@ -37,7 +53,7 @@ const mealPlanDaySchema = new mongoose.Schema({
       suggestions: [String],
     },
   ],
-})
+});
 
 const trainerPlanSchema = new mongoose.Schema(
   {
@@ -74,7 +90,7 @@ const trainerPlanSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
-export default mongoose.model("TrainerPlan", trainerPlanSchema)
+export default mongoose.model("TrainerPlan", trainerPlanSchema);

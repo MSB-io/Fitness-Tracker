@@ -1,4 +1,4 @@
-import mongoose from "mongoose"
+import mongoose from "mongoose";
 
 const foodItemSchema = new mongoose.Schema({
   name: {
@@ -24,7 +24,7 @@ const foodItemSchema = new mongoose.Schema({
     default: "vegetarian",
   },
   region: String, // North Indian, South Indian, etc.
-})
+});
 
 const mealSchema = new mongoose.Schema(
   {
@@ -63,16 +63,28 @@ const mealSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
-)
+  }
+);
 
 // Calculate totals before saving
 mealSchema.pre("save", function (next) {
-  this.totalCalories = this.foods.reduce((sum, food) => sum + food.calories * food.quantity, 0)
-  this.totalProtein = this.foods.reduce((sum, food) => sum + (food.protein || 0) * food.quantity, 0)
-  this.totalCarbs = this.foods.reduce((sum, food) => sum + (food.carbs || 0) * food.quantity, 0)
-  this.totalFat = this.foods.reduce((sum, food) => sum + (food.fat || 0) * food.quantity, 0)
-  next()
-})
+  this.totalCalories = this.foods.reduce(
+    (sum, food) => sum + food.calories * food.quantity,
+    0
+  );
+  this.totalProtein = this.foods.reduce(
+    (sum, food) => sum + (food.protein || 0) * food.quantity,
+    0
+  );
+  this.totalCarbs = this.foods.reduce(
+    (sum, food) => sum + (food.carbs || 0) * food.quantity,
+    0
+  );
+  this.totalFat = this.foods.reduce(
+    (sum, food) => sum + (food.fat || 0) * food.quantity,
+    0
+  );
+  next();
+});
 
-export default mongoose.model("Meal", mealSchema)
+export default mongoose.model("Meal", mealSchema);
