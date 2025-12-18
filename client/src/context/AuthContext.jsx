@@ -103,6 +103,7 @@ export const AuthProvider = ({ children }) => {
         delete api.defaults.headers.common["Authorization"];
       }
     }
+    {/* After check (regardless of outcome), set loading to false */ }
     setLoading(false);
   };
 
