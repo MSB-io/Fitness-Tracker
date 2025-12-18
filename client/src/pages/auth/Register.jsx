@@ -1,61 +1,66 @@
-"use client"
-
-import { useState } from "react"
-import { Link } from "react-router-dom"
-import { useAuth } from "../../context/AuthContext"
-import Button from "../../components/ui/Button"
-import Input from "../../components/ui/Input"
-import Select from "../../components/ui/Select"
-import Card from "../../components/ui/Card"
+import { useState } from "react";
+import { Link } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
+import Button from "../../components/ui/Button";
+import Input from "../../components/ui/Input";
+import Select from "../../components/ui/Select";
+import Card from "../../components/ui/Card";
 
 const Register = () => {
-  const { register, error } = useAuth()
+  const { register, error } = useAuth();
   const [formData, setFormData] = useState({
     name: "",
     email: "",
     password: "",
     confirmPassword: "",
     role: "user",
-  })
-  const [loading, setLoading] = useState(false)
-  const [formError, setFormError] = useState("")
+  });
+  const [loading, setLoading] = useState(false);
+  const [formError, setFormError] = useState("");
 
   const handleChange = (e) => {
-    setFormData({ ...formData, [e.target.name]: e.target.value })
-    setFormError("")
-  }
+    setFormData({ ...formData, [e.target.name]: e.target.value });
+    setFormError("");
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
-    setFormError("")
+    e.preventDefault();
+    setLoading(true);
+    setFormError("");
 
     if (formData.password !== formData.confirmPassword) {
-      setFormError("Passwords do not match")
-      setLoading(false)
-      return
+      setFormError("Passwords do not match");
+      setLoading(false);
+      return;
     }
 
     if (formData.password.length < 6) {
-      setFormError("Password must be at least 6 characters")
-      setLoading(false)
-      return
+      setFormError("Password must be at least 6 characters");
+      setLoading(false);
+      return;
     }
 
-    const result = await register(formData.name, formData.email, formData.password, formData.role)
+    const result = await register(
+      formData.name,
+      formData.email,
+      formData.password,
+      formData.role
+    );
 
     if (!result.success) {
-      setFormError(result.error)
+      setFormError(result.error);
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   return (
     <Card>
       <Card.Header>
         <Card.Title className="text-2xl text-center">Create Account</Card.Title>
-        <Card.Description className="text-center">Start your fitness journey today</Card.Description>
+        <Card.Description className="text-center">
+          Start your fitness journey today
+        </Card.Description>
       </Card.Header>
       <Card.Content>
         <form onSubmit={handleSubmit} className="space-y-4">
@@ -122,14 +127,17 @@ const Register = () => {
 
           <p className="text-center text-sm text-muted">
             Already have an account?{" "}
-            <Link to="/login" className="text-primary font-medium hover:underline">
+            <Link
+              to="/login"
+              className="text-primary font-medium hover:underline"
+            >
               Sign in
             </Link>
           </p>
         </form>
       </Card.Content>
     </Card>
-  )
-}
+  );
+};
 
-export default Register
+export default Register;
