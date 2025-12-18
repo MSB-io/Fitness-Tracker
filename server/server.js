@@ -20,6 +20,7 @@ const app = express(); // Initialize Express app
 connectDB(); // Ensure this function handles connection errors internally
 
 // Middleware - Updated CORS for production
+// runs for every request
 app.use(
   cors({
     origin: process.env.CLIENT_URL || "http://localhost:5173",
