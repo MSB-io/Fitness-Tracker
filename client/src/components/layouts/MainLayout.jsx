@@ -1,7 +1,5 @@
-"use client"
-
-import { Outlet, NavLink, useNavigate } from "react-router-dom"
-import { useAuth } from "../../context/AuthContext"
+import { Outlet, NavLink, useNavigate } from "react-router-dom";
+import { useAuth } from "../../context/AuthContext";
 import {
   LayoutDashboard,
   Dumbbell,
@@ -16,18 +14,18 @@ import {
   User,
   Menu,
   X,
-} from "lucide-react"
-import { useState } from "react"
+} from "lucide-react";
+import { useState } from "react";
 
 const MainLayout = () => {
-  const { user, logout, isTrainer } = useAuth()
-  const navigate = useNavigate()
-  const [sidebarOpen, setSidebarOpen] = useState(false)
+  const { user, logout, isTrainer } = useAuth();
+  const navigate = useNavigate();
+  const [sidebarOpen, setSidebarOpen] = useState(false);
 
   const handleLogout = () => {
-    logout()
-    navigate("/login")
-  }
+    logout();
+    navigate("/login");
+  };
 
   const userNavItems = [
     { to: "/dashboard", icon: LayoutDashboard, label: "Dashboard" },
@@ -37,14 +35,19 @@ const MainLayout = () => {
     { to: "/goals", icon: Target, label: "Goals" },
     { to: "/my-plan", icon: ClipboardList, label: "My Plan" },
     { to: "/reports", icon: BarChart3, label: "Reports" },
-  ]
+  ];
 
   const trainerNavItems = [
-    { to: "/trainer", icon: LayoutDashboard, label: "Trainer Dashboard", end: true },
+    {
+      to: "/trainer",
+      icon: LayoutDashboard,
+      label: "Trainer Dashboard",
+      end: true,
+    },
     { to: "/trainer/requests", icon: UserPlus, label: "Requests" },
     { to: "/trainer/clients", icon: Users, label: "Clients" },
     { to: "/trainer/plans", icon: ClipboardList, label: "Plans" },
-  ]
+  ];
 
   // Group navigation items by section for trainers
   const navSections = isTrainer
@@ -52,13 +55,16 @@ const MainLayout = () => {
         { title: "Trainer Tools", items: trainerNavItems },
         { title: "My Fitness", items: userNavItems },
       ]
-    : [{ title: null, items: userNavItems }]
+    : [{ title: null, items: userNavItems }];
 
   return (
     <div className="flex h-screen bg-background">
       {/* Mobile sidebar backdrop */}
       {sidebarOpen && (
-        <div className="fixed inset-0 bg-black/50 z-40 lg:hidden" onClick={() => setSidebarOpen(false)} />
+        <div
+          className="fixed inset-0 bg-black/50 z-40 lg:hidden"
+          onClick={() => setSidebarOpen(false)}
+        />
       )}
 
       {/* Sidebar */}
@@ -71,7 +77,10 @@ const MainLayout = () => {
           {/* Logo */}
           <div className="flex items-center justify-between h-16 px-6 border-b border-border">
             <h1 className="text-xl font-bold text-primary">FitTrack</h1>
-            <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(false)}>
+            <button
+              className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+              onClick={() => setSidebarOpen(false)}
+            >
               <X size={20} />
             </button>
           </div>
@@ -82,7 +91,9 @@ const MainLayout = () => {
               <div key={sectionIndex}>
                 {section.title && (
                   <div className="px-4 mb-2">
-                    <p className="text-xs font-semibold text-muted uppercase tracking-wider">{section.title}</p>
+                    <p className="text-xs font-semibold text-muted uppercase tracking-wider">
+                      {section.title}
+                    </p>
                   </div>
                 )}
                 <div className="space-y-1">
@@ -94,7 +105,9 @@ const MainLayout = () => {
                       onClick={() => setSidebarOpen(false)}
                       className={({ isActive }) =>
                         `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors ${
-                          isActive ? "bg-primary text-white" : "text-secondary hover:bg-gray-100"
+                          isActive
+                            ? "bg-primary text-white"
+                            : "text-secondary hover:bg-gray-100"
                         }`
                       }
                     >
@@ -114,7 +127,9 @@ const MainLayout = () => {
               onClick={() => setSidebarOpen(false)}
               className={({ isActive }) =>
                 `flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium transition-colors mb-2 ${
-                  isActive ? "bg-primary text-white" : "text-secondary hover:bg-gray-100"
+                  isActive
+                    ? "bg-primary text-white"
+                    : "text-secondary hover:bg-gray-100"
                 }`
               }
             >
@@ -136,14 +151,22 @@ const MainLayout = () => {
       <div className="flex-1 flex flex-col overflow-hidden">
         {/* Top bar */}
         <header className="h-16 bg-surface border-b border-border flex items-center justify-between px-6">
-          <button className="lg:hidden p-2 hover:bg-gray-100 rounded-lg" onClick={() => setSidebarOpen(true)}>
+          <button
+            className="lg:hidden p-2 hover:bg-gray-100 rounded-lg"
+            onClick={() => setSidebarOpen(true)}
+          >
             <Menu size={24} />
           </button>
           <div className="flex items-center gap-4 ml-auto">
             <span className="text-sm text-muted">
-              Welcome, <span className="font-medium text-primary">{user?.name}</span>
+              Welcome,{" "}
+              <span className="font-medium text-primary">{user?.name}</span>
             </span>
-            {isTrainer && <span className="px-2 py-1 text-xs font-medium bg-primary text-white rounded">Trainer</span>}
+            {isTrainer && (
+              <span className="px-2 py-1 text-xs font-medium bg-primary text-white rounded">
+                Trainer
+              </span>
+            )}
           </div>
         </header>
 
@@ -153,7 +176,7 @@ const MainLayout = () => {
         </main>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MainLayout
+export default MainLayout;

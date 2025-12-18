@@ -10,7 +10,7 @@ const EmptyState = ({ icon: Icon, title, description, action }) => {
       {description && <p className="text-muted mb-4 max-w-sm">{description}</p>}
       {action && action}
     </div>
-  )
-}
+  );
+};
 
-export default EmptyState
+export default EmptyState;
