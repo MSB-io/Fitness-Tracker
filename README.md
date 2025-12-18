@@ -15,6 +15,7 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 ## Tech Stack
 
 ### Backend
+
 - Node.js
 - Express.js
 - MongoDB with Mongoose
@@ -22,6 +23,7 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 - bcrypt for password hashing
 
 ### Frontend
+
 - React 18 with Vite
 - React Router v6
 - Recharts for data visualization
@@ -31,12 +33,14 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 ## API Endpoints
 
 ### Authentication
+
 - `POST /api/auth/register` - Register new user
 - `POST /api/auth/login` - Login user
 - `GET /api/auth/me` - Get current user
 - `PUT /api/auth/profile` - Update profile
 
 ### Workouts
+
 - `GET /api/workouts` - Get all workouts
 - `POST /api/workouts` - Create workout
 - `PUT /api/workouts/:id` - Update workout
@@ -44,6 +48,7 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 - `GET /api/workouts/stats/summary` - Get workout stats
 
 ### Meals
+
 - `GET /api/meals` - Get all meals
 - `GET /api/meals/today` - Get today's meals
 - `POST /api/meals` - Create meal
@@ -51,20 +56,24 @@ A full-stack fitness tracking application built with MongoDB, Express.js, React,
 - `DELETE /api/meals/:id` - Delete meal
 
 ### Weight
+
 - `GET /api/weight` - Get weight logs
 - `POST /api/weight` - Add weight entry
 - `GET /api/weight/stats/progress` - Get progress stats
 
 ### Goals
+
 - `GET /api/goals` - Get all goals
 - `POST /api/goals` - Create goal
 - `PUT /api/goals/:id/progress` - Update goal progress
 
 ### Trainer (Trainer role only)
+
 - `GET /api/trainer/clients` - Get assigned clients
 - `POST /api/trainer/plans` - Create training plan
 - `GET /api/trainer/plans` - Get all plans
 
 ### Reports
+
 - `GET /api/reports/summary` - Get comprehensive report
 - `GET /api/reports/weekly` - Get weekly breakdown
