@@ -1,28 +1,39 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { User, Mail, Activity, Ruler, Calendar, Users, X, Check } from "lucide-react"
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Input from "../components/ui/Input"
-import Select from "../components/ui/Select"
-import Badge from "../components/ui/Badge"
-import Modal from "../components/ui/Modal"
-import { useAuth } from "../context/AuthContext"
-import { trainerRequestService } from "../services/trainerRequest"
-import { calculateBMI, getBMICategory, calculateDailyCalories } from "../utils/helpers"
+import { useState, useEffect } from "react";
+import {
+  User,
+  Mail,
+  Activity,
+  Ruler,
+  Calendar,
+  Users,
+  X,
+  Check,
+} from "lucide-react";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Select from "../components/ui/Select";
+import Badge from "../components/ui/Badge";
+import Modal from "../components/ui/Modal";
+import { useAuth } from "../context/AuthContext";
+import { trainerRequestService } from "../services/trainerRequest";
+import {
+  calculateBMI,
+  getBMICategory,
+  calculateDailyCalories,
+} from "../utils/helpers";
 
 const Profile = () => {
-  const { user, updateProfile, refreshUser } = useAuth()
-  const [editing, setEditing] = useState(false)
-  const [loading, setLoading] = useState(false)
-  const [showTrainerModal, setShowTrainerModal] = useState(false)
-  const [trainers, setTrainers] = useState([])
-  const [selectedTrainer, setSelectedTrainer] = useState("")
-  const [requestMessage, setRequestMessage] = useState("")
-  const [pendingRequest, setPendingRequest] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
-  
+  const { user, updateProfile, refreshUser } = useAuth();
+  const [editing, setEditing] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [showTrainerModal, setShowTrainerModal] = useState(false);
+  const [trainers, setTrainers] = useState([]);
+  const [selectedTrainer, setSelectedTrainer] = useState("");
+  const [requestMessage, setRequestMessage] = useState("");
+  const [pendingRequest, setPendingRequest] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
+
   const [formData, setFormData] = useState({
     name: user?.name || "",
     profile: {
@@ -34,98 +45,101 @@ const Profile = () => {
       heightInches: user?.profile?.heightInches || "",
       activityLevel: user?.profile?.activityLevel || "moderate",
     },
-  })
+  });
 
   useEffect(() => {
     if (!user?.assignedTrainer && user?.role === "user") {
-      fetchPendingRequest()
+      fetchPendingRequest();
     }
-  }, [user])
+  }, [user]);
 
   const fetchPendingRequest = async () => {
     try {
-      const request = await trainerRequestService.getMyRequest()
-      setPendingRequest(request)
+      const request = await trainerRequestService.getMyRequest();
+      setPendingRequest(request);
     } catch (error) {
-      console.error("Failed to fetch pending request:", error)
+      console.error("Failed to fetch pending request:", error);
     }
-  }
+  };
 
   const fetchTrainers = async () => {
     try {
-      const data = await trainerRequestService.getAvailableTrainers()
-      setTrainers(data)
+      const data = await trainerRequestService.getAvailableTrainers();
+      setTrainers(data);
     } catch (error) {
-      console.error("Failed to fetch trainers:", error)
+      console.error("Failed to fetch trainers:", error);
     }
-  }
+  };
 
   const handleRequestTrainer = async () => {
-    if (!selectedTrainer) return
-    
-    setSubmitting(true)
+    if (!selectedTrainer) return;
+
+    setSubmitting(true);
     try {
-      await trainerRequestService.requestTrainer(selectedTrainer, requestMessage)
-      setShowTrainerModal(false)
-      setSelectedTrainer("")
-      setRequestMessage("")
-      fetchPendingRequest()
+      await trainerRequestService.requestTrainer(
+        selectedTrainer,
+        requestMessage
+      );
+      setShowTrainerModal(false);
+      setSelectedTrainer("");
+      setRequestMessage("");
+      fetchPendingRequest();
     } catch (error) {
-      console.error("Failed to request trainer:", error)
-      alert(error.response?.data?.message || "Failed to send request")
+      console.error("Failed to request trainer:", error);
+      alert(error.response?.data?.message || "Failed to send request");
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleCancelRequest = async () => {
-    if (!pendingRequest) return
-    
+    if (!pendingRequest) return;
+
     try {
-      await trainerRequestService.cancelRequest(pendingRequest._id)
-      setPendingRequest(null)
+      await trainerRequestService.cancelRequest(pendingRequest._id);
+      setPendingRequest(null);
     } catch (error) {
-      console.error("Failed to cancel request:", error)
+      console.error("Failed to cancel request:", error);
     }
-  }
+  };
 
   const handleRemoveTrainer = async () => {
-    if (!confirm("Are you sure you want to remove your trainer?")) return
-    
+    if (!confirm("Are you sure you want to remove your trainer?")) return;
+
     try {
-      await trainerRequestService.removeTrainer()
-      await refreshUser()
+      await trainerRequestService.removeTrainer();
+      await refreshUser();
     } catch (error) {
-      console.error("Failed to remove trainer:", error)
+      console.error("Failed to remove trainer:", error);
     }
-  }
+  };
 
   const openTrainerModal = async () => {
-    setShowTrainerModal(true)
-    fetchTrainers()
-  }
+    setShowTrainerModal(true);
+    fetchTrainers();
+  };
 
   const handleChange = (field, value) => {
     if (field === "name") {
-      setFormData({ ...formData, name: value })
+      setFormData({ ...formData, name: value });
     } else {
       setFormData({
         ...formData,
         profile: { ...formData.profile, [field]: value },
-      })
+      });
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setLoading(true)
+    e.preventDefault();
+    setLoading(true);
 
     // Convert feet/inches to cm if using imperial
-    let heightInCm = formData.profile.height
+    let heightInCm = formData.profile.height;
     if (formData.profile.heightUnit === "ft") {
-      const feet = Number.parseInt(formData.profile.heightFeet) || 0
-      const inches = Number.parseInt(formData.profile.heightInches) || 0
-      heightInCm = Math.round((feet * 12 + inches) * 2.54)
+      const feet = Number.parseInt(formData.profile.heightFeet) || 0;
+      const inches = Number.parseInt(formData.profile.heightInches) || 0;
+      heightInCm = Math.round((feet * 12 + inches) * 2.54);
     }
 
     const result = await updateProfile({
@@ -135,18 +149,24 @@ const Profile = () => {
         gender: formData.profile.gender || null,
         height: Number.parseInt(heightInCm) || null,
         heightUnit: formData.profile.heightUnit,
-        heightFeet: formData.profile.heightUnit === "ft" ? Number.parseInt(formData.profile.heightFeet) || null : null,
-        heightInches: formData.profile.heightUnit === "ft" ? Number.parseInt(formData.profile.heightInches) || null : null,
+        heightFeet:
+          formData.profile.heightUnit === "ft"
+            ? Number.parseInt(formData.profile.heightFeet) || null
+            : null,
+        heightInches:
+          formData.profile.heightUnit === "ft"
+            ? Number.parseInt(formData.profile.heightInches) || null
+            : null,
         activityLevel: formData.profile.activityLevel,
       },
-    })
+    });
 
     if (result.success) {
-      setEditing(false)
+      setEditing(false);
     }
 
-    setLoading(false)
-  }
+    setLoading(false);
+  };
 
   const activityLevels = [
     { value: "sedentary", label: "Sedentary (little or no exercise)" },
@@ -154,23 +174,25 @@ const Profile = () => {
     { value: "moderate", label: "Moderate (3-5 days/week)" },
     { value: "active", label: "Active (6-7 days/week)" },
     { value: "very_active", label: "Very Active (hard exercise daily)" },
-  ]
+  ];
 
   const genderOptions = [
     { value: "male", label: "Male" },
     { value: "female", label: "Female" },
     { value: "other", label: "Other" },
-  ]
+  ];
 
   // Calculate BMI and daily calories based on a default weight (could be enhanced with actual weight)
-  const bmi = user?.profile?.height ? calculateBMI(70, user.profile.height) : null
+  const bmi = user?.profile?.height
+    ? calculateBMI(70, user.profile.height)
+    : null;
   const dailyCalories = calculateDailyCalories(
     70,
     user?.profile?.height,
     user?.profile?.age,
     user?.profile?.gender,
-    user?.profile?.activityLevel,
-  )
+    user?.profile?.activityLevel
+  );
 
   return (
     <div className="space-y-6 max-w-2xl">
@@ -180,7 +202,9 @@ const Profile = () => {
           <h1 className="text-2xl font-bold text-primary">Profile</h1>
           <p className="text-muted">Manage your account settings</p>
         </div>
-        {!editing && <Button onClick={() => setEditing(true)}>Edit Profile</Button>}
+        {!editing && (
+          <Button onClick={() => setEditing(true)}>Edit Profile</Button>
+        )}
       </div>
 
       {/* Profile Card */}
@@ -195,7 +219,10 @@ const Profile = () => {
               <Mail size={16} className="text-muted" />
               <span className="text-muted">{user?.email}</span>
             </div>
-            <Badge variant={user?.role === "trainer" ? "primary" : "default"} className="mt-1">
+            <Badge
+              variant={user?.role === "trainer" ? "primary" : "default"}
+              className="mt-1"
+            >
               {user?.role === "trainer" ? "Trainer" : "User"}
             </Badge>
           </div>
@@ -228,7 +255,9 @@ const Profile = () => {
             </div>
 
             <div>
-              <label className="block text-sm font-medium text-primary mb-2">Height</label>
+              <label className="block text-sm font-medium text-primary mb-2">
+                Height
+              </label>
               <div className="flex gap-2 mb-3">
                 <button
                   type="button"
@@ -253,7 +282,7 @@ const Profile = () => {
                   Feet & Inches
                 </button>
               </div>
-              
+
               {formData.profile.heightUnit === "cm" ? (
                 <Input
                   type="number"
@@ -274,7 +303,9 @@ const Profile = () => {
                     label="Inches"
                     type="number"
                     value={formData.profile.heightInches}
-                    onChange={(e) => handleChange("heightInches", e.target.value)}
+                    onChange={(e) =>
+                      handleChange("heightInches", e.target.value)
+                    }
                     placeholder="e.g., 8"
                   />
                 </div>
@@ -289,7 +320,11 @@ const Profile = () => {
             />
 
             <div className="flex gap-3 justify-end pt-4">
-              <Button type="button" variant="outline" onClick={() => setEditing(false)}>
+              <Button
+                type="button"
+                variant="outline"
+                onClick={() => setEditing(false)}
+              >
                 Cancel
               </Button>
               <Button type="submit" loading={loading}>
@@ -305,7 +340,9 @@ const Profile = () => {
                 <div>
                   <p className="text-sm text-muted">Age</p>
                   <p className="font-medium text-primary">
-                    {user?.profile?.age ? `${user.profile.age} years` : "Not set"}
+                    {user?.profile?.age
+                      ? `${user.profile.age} years`
+                      : "Not set"}
                   </p>
                 </div>
               </div>
@@ -313,7 +350,9 @@ const Profile = () => {
                 <User className="text-muted" size={20} />
                 <div>
                   <p className="text-sm text-muted">Gender</p>
-                  <p className="font-medium text-primary capitalize">{user?.profile?.gender || "Not set"}</p>
+                  <p className="font-medium text-primary capitalize">
+                    {user?.profile?.gender || "Not set"}
+                  </p>
                 </div>
               </div>
               <div className="flex items-center gap-3 p-3 bg-gray-50 rounded-lg">
@@ -321,11 +360,14 @@ const Profile = () => {
                 <div>
                   <p className="text-sm text-muted">Height</p>
                   <p className="font-medium text-primary">
-                    {user?.profile?.height ? (
-                      user?.profile?.heightUnit === "ft" && user?.profile?.heightFeet ? 
-                        `${user.profile.heightFeet}'${user.profile.heightInches || 0}" (${user.profile.height} cm)` :
-                        `${user.profile.height} cm`
-                    ) : "Not set"}
+                    {user?.profile?.height
+                      ? user?.profile?.heightUnit === "ft" &&
+                        user?.profile?.heightFeet
+                        ? `${user.profile.heightFeet}'${
+                            user.profile.heightInches || 0
+                          }" (${user.profile.height} cm)`
+                        : `${user.profile.height} cm`
+                      : "Not set"}
                   </p>
                 </div>
               </div>
@@ -334,7 +376,8 @@ const Profile = () => {
                 <div>
                   <p className="text-sm text-muted">Activity Level</p>
                   <p className="font-medium text-primary capitalize">
-                    {user?.profile?.activityLevel?.replace("_", " ") || "Moderate"}
+                    {user?.profile?.activityLevel?.replace("_", " ") ||
+                      "Moderate"}
                   </p>
                 </div>
               </div>
@@ -348,7 +391,9 @@ const Profile = () => {
         <Card>
           <Card.Header>
             <Card.Title>Health Metrics</Card.Title>
-            <Card.Description>Based on your profile information</Card.Description>
+            <Card.Description>
+              Based on your profile information
+            </Card.Description>
           </Card.Header>
           <Card.Content>
             <div className="grid grid-cols-2 gap-4">
@@ -356,7 +401,11 @@ const Profile = () => {
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-muted mb-1">BMI (estimated)</p>
                   <p className="text-2xl font-bold text-primary">{bmi}</p>
-                  <Badge variant={getBMICategory(bmi) === "Normal" ? "success" : "warning"}>
+                  <Badge
+                    variant={
+                      getBMICategory(bmi) === "Normal" ? "success" : "warning"
+                    }
+                  >
                     {getBMICategory(bmi)}
                   </Badge>
                 </div>
@@ -364,7 +413,9 @@ const Profile = () => {
               {dailyCalories && (
                 <div className="p-4 bg-gray-50 rounded-lg">
                   <p className="text-sm text-muted mb-1">Daily Calorie Need</p>
-                  <p className="text-2xl font-bold text-primary">{dailyCalories}</p>
+                  <p className="text-2xl font-bold text-primary">
+                    {dailyCalories}
+                  </p>
                   <span className="text-sm text-muted">kcal/day</span>
                 </div>
               )}
@@ -372,13 +423,15 @@ const Profile = () => {
           </Card.Content>
         </Card>
       )}
-      
+
       {/* Trainer Section - Only for regular users */}
       {user?.role === "user" && (
         <Card>
           <Card.Header>
             <Card.Title>Your Trainer</Card.Title>
-            <Card.Description>Manage your personal trainer assignment</Card.Description>
+            <Card.Description>
+              Manage your personal trainer assignment
+            </Card.Description>
           </Card.Header>
           <Card.Content>
             {user?.assignedTrainer ? (
@@ -388,12 +441,20 @@ const Profile = () => {
                     {user.assignedTrainer.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1">
-                    <p className="font-semibold text-primary">{user.assignedTrainer.name}</p>
-                    <p className="text-sm text-muted">{user.assignedTrainer.email}</p>
+                    <p className="font-semibold text-primary">
+                      {user.assignedTrainer.name}
+                    </p>
+                    <p className="text-sm text-muted">
+                      {user.assignedTrainer.email}
+                    </p>
                   </div>
                   <Badge variant="success">Active</Badge>
                 </div>
-                <Button variant="outline" onClick={handleRemoveTrainer} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={handleRemoveTrainer}
+                  className="w-full"
+                >
                   Change Trainer
                 </Button>
               </div>
@@ -405,17 +466,26 @@ const Profile = () => {
                       <Users className="text-yellow-600" size={20} />
                     </div>
                     <div className="flex-1">
-                      <p className="font-semibold text-primary">Request Pending</p>
+                      <p className="font-semibold text-primary">
+                        Request Pending
+                      </p>
                       <p className="text-sm text-muted mt-1">
-                        You have a pending request to <strong>{pendingRequest.trainer?.name}</strong>
+                        You have a pending request to{" "}
+                        <strong>{pendingRequest.trainer?.name}</strong>
                       </p>
                       {pendingRequest.message && (
-                        <p className="text-sm text-muted mt-2 italic">"{pendingRequest.message}"</p>
+                        <p className="text-sm text-muted mt-2 italic">
+                          "{pendingRequest.message}"
+                        </p>
                       )}
                     </div>
                   </div>
                 </div>
-                <Button variant="outline" onClick={handleCancelRequest} className="w-full">
+                <Button
+                  variant="outline"
+                  onClick={handleCancelRequest}
+                  className="w-full"
+                >
                   Cancel Request
                 </Button>
               </div>
@@ -432,12 +502,19 @@ const Profile = () => {
           </Card.Content>
         </Card>
       )}
-      
+
       {/* Trainer Selection Modal */}
-      <Modal isOpen={showTrainerModal} onClose={() => setShowTrainerModal(false)} title="Request a Trainer" size="md">
+      <Modal
+        isOpen={showTrainerModal}
+        onClose={() => setShowTrainerModal(false)}
+        title="Request a Trainer"
+        size="md"
+      >
         <div className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">Select Trainer</label>
+            <label className="block text-sm font-medium text-primary mb-2">
+              Select Trainer
+            </label>
             {trainers.length > 0 ? (
               <div className="space-y-2 max-h-64 overflow-y-auto">
                 {trainers.map((trainer) => (
@@ -455,7 +532,9 @@ const Profile = () => {
                         {trainer.name?.charAt(0).toUpperCase()}
                       </div>
                       <div className="flex-1">
-                        <p className="font-medium text-primary">{trainer.name}</p>
+                        <p className="font-medium text-primary">
+                          {trainer.name}
+                        </p>
                         <p className="text-sm text-muted">{trainer.email}</p>
                       </div>
                       {selectedTrainer === trainer._id && (
@@ -471,7 +550,9 @@ const Profile = () => {
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-primary mb-2">Message (Optional)</label>
+            <label className="block text-sm font-medium text-primary mb-2">
+              Message (Optional)
+            </label>
             <textarea
               value={requestMessage}
               onChange={(e) => setRequestMessage(e.target.value)}
@@ -480,21 +561,31 @@ const Profile = () => {
               rows={4}
               maxLength={500}
             />
-            <p className="text-xs text-muted mt-1">{requestMessage.length}/500</p>
+            <p className="text-xs text-muted mt-1">
+              {requestMessage.length}/500
+            </p>
           </div>
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setShowTrainerModal(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowTrainerModal(false)}
+            >
               Cancel
             </Button>
-            <Button onClick={handleRequestTrainer} loading={submitting} disabled={!selectedTrainer}>
+            <Button
+              onClick={handleRequestTrainer}
+              loading={submitting}
+              disabled={!selectedTrainer}
+            >
               Send Request
             </Button>
           </div>
         </div>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default Profile
+export default Profile;

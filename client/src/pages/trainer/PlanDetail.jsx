@@ -1,25 +1,33 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { useParams, Link, useNavigate } from "react-router-dom"
-import { ArrowLeft, User, Calendar, Target, Utensils, Trash2, Edit, Plus, X } from "lucide-react"
-import Card from "../../components/ui/Card"
-import Button from "../../components/ui/Button"
-import Badge from "../../components/ui/Badge"
-import Modal from "../../components/ui/Modal"
-import Input from "../../components/ui/Input"
-import { trainerService } from "../../services/trainer"
-import { formatDate } from "../../utils/helpers"
+import { useState, useEffect } from "react";
+import { useParams, Link, useNavigate } from "react-router-dom";
+import {
+  ArrowLeft,
+  User,
+  Calendar,
+  Target,
+  Utensils,
+  Trash2,
+  Edit,
+  Plus,
+  X,
+} from "lucide-react";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Badge from "../../components/ui/Badge";
+import Modal from "../../components/ui/Modal";
+import Input from "../../components/ui/Input";
+import { trainerService } from "../../services/trainer";
+import { formatDate } from "../../utils/helpers";
 
 const PlanDetail = () => {
-  const { id } = useParams()
-  const navigate = useNavigate()
-  const [loading, setLoading] = useState(true)
-  const [plan, setPlan] = useState(null)
-  const [showDeleteModal, setShowDeleteModal] = useState(false)
-  const [showEditModal, setShowEditModal] = useState(false)
-  const [deleting, setDeleting] = useState(false)
-  const [updating, setUpdating] = useState(false)
+  const { id } = useParams();
+  const navigate = useNavigate();
+  const [loading, setLoading] = useState(true);
+  const [plan, setPlan] = useState(null);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [deleting, setDeleting] = useState(false);
+  const [updating, setUpdating] = useState(false);
   const [editData, setEditData] = useState({
     name: "",
     description: "",
@@ -31,57 +39,65 @@ const PlanDetail = () => {
     status: "active",
     workoutPlan: [],
     mealPlan: [],
-  })
+  });
 
   useEffect(() => {
-    fetchPlan()
-  }, [id])
+    fetchPlan();
+  }, [id]);
 
   const fetchPlan = async () => {
     try {
-      const data = await trainerService.getPlanById(id)
-      setPlan(data)
+      const data = await trainerService.getPlanById(id);
+      setPlan(data);
       setEditData({
         name: data.name || "",
         description: data.description || "",
         dailyCalorieTarget: data.dailyCalorieTarget || "",
         dailyProteinTarget: data.dailyProteinTarget || "",
-        startDate: data.startDate ? new Date(data.startDate).toISOString().split("T")[0] : "",
-        endDate: data.endDate ? new Date(data.endDate).toISOString().split("T")[0] : "",
+        startDate: data.startDate
+          ? new Date(data.startDate).toISOString().split("T")[0]
+          : "",
+        endDate: data.endDate
+          ? new Date(data.endDate).toISOString().split("T")[0]
+          : "",
         notes: data.notes || "",
         status: data.status || "active",
         workoutPlan: data.workoutPlan || [],
         mealPlan: data.mealPlan || [],
-      })
+      });
     } catch (error) {
-      console.error("Failed to fetch plan:", error)
-      navigate("/trainer/plans")
+      console.error("Failed to fetch plan:", error);
+      navigate("/trainer/plans");
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleEdit = () => {
-    setShowEditModal(true)
-  }
+    setShowEditModal(true);
+  };
 
   const handleUpdate = async (e) => {
-    e.preventDefault()
-    setUpdating(true)
+    e.preventDefault();
+    setUpdating(true);
     try {
       await trainerService.updatePlan(id, {
         ...editData,
-        dailyCalorieTarget: editData.dailyCalorieTarget ? Number.parseInt(editData.dailyCalorieTarget) : undefined,
-        dailyProteinTarget: editData.dailyProteinTarget ? Number.parseInt(editData.dailyProteinTarget) : undefined,
-      })
-      setShowEditModal(false)
-      await fetchPlan()
+        dailyCalorieTarget: editData.dailyCalorieTarget
+          ? Number.parseInt(editData.dailyCalorieTarget)
+          : undefined,
+        dailyProteinTarget: editData.dailyProteinTarget
+          ? Number.parseInt(editData.dailyProteinTarget)
+          : undefined,
+      });
+      setShowEditModal(false);
+      await fetchPlan();
     } catch (error) {
-      console.error("Failed to update plan:", error)
+      console.error("Failed to update plan:", error);
     } finally {
-      setUpdating(false)
+      setUpdating(false);
     }
-  }
+  };
 
   const addWorkoutDay = () => {
     setEditData({
@@ -90,121 +106,130 @@ const PlanDetail = () => {
         ...editData.workoutPlan,
         { day: "monday", exercises: [], isRestDay: false },
       ],
-    })
-  }
+    });
+  };
 
   const removeWorkoutDay = (index) => {
     setEditData({
       ...editData,
       workoutPlan: editData.workoutPlan.filter((_, i) => i !== index),
-    })
-  }
+    });
+  };
 
   const updateWorkoutDay = (index, field, value) => {
-    const updated = [...editData.workoutPlan]
-    updated[index] = { ...updated[index], [field]: value }
-    setEditData({ ...editData, workoutPlan: updated })
-  }
+    const updated = [...editData.workoutPlan];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditData({ ...editData, workoutPlan: updated });
+  };
 
   const addExerciseToDay = (dayIndex) => {
-    const updated = [...editData.workoutPlan]
+    const updated = [...editData.workoutPlan];
     updated[dayIndex].exercises = [
       ...(updated[dayIndex].exercises || []),
       { name: "", sets: "", reps: "", weight: "", duration: "", notes: "" },
-    ]
-    setEditData({ ...editData, workoutPlan: updated })
-  }
+    ];
+    setEditData({ ...editData, workoutPlan: updated });
+  };
 
   const removeExerciseFromDay = (dayIndex, exerciseIndex) => {
-    const updated = [...editData.workoutPlan]
-    updated[dayIndex].exercises = updated[dayIndex].exercises.filter((_, i) => i !== exerciseIndex)
-    setEditData({ ...editData, workoutPlan: updated })
-  }
+    const updated = [...editData.workoutPlan];
+    updated[dayIndex].exercises = updated[dayIndex].exercises.filter(
+      (_, i) => i !== exerciseIndex
+    );
+    setEditData({ ...editData, workoutPlan: updated });
+  };
 
   const updateExercise = (dayIndex, exerciseIndex, field, value) => {
-    const updated = [...editData.workoutPlan]
+    const updated = [...editData.workoutPlan];
     updated[dayIndex].exercises[exerciseIndex] = {
       ...updated[dayIndex].exercises[exerciseIndex],
       [field]: value,
-    }
-    setEditData({ ...editData, workoutPlan: updated })
-  }
+    };
+    setEditData({ ...editData, workoutPlan: updated });
+  };
 
   const addMealDay = () => {
     setEditData({
       ...editData,
       mealPlan: [...editData.mealPlan, { day: "monday", meals: [] }],
-    })
-  }
+    });
+  };
 
   const removeMealDay = (index) => {
     setEditData({
       ...editData,
       mealPlan: editData.mealPlan.filter((_, i) => i !== index),
-    })
-  }
+    });
+  };
 
   const updateMealDay = (index, field, value) => {
-    const updated = [...editData.mealPlan]
-    updated[index] = { ...updated[index], [field]: value }
-    setEditData({ ...editData, mealPlan: updated })
-  }
+    const updated = [...editData.mealPlan];
+    updated[index] = { ...updated[index], [field]: value };
+    setEditData({ ...editData, mealPlan: updated });
+  };
 
   const addMealToDay = (dayIndex) => {
-    const updated = [...editData.mealPlan]
+    const updated = [...editData.mealPlan];
     updated[dayIndex].meals = [
       ...(updated[dayIndex].meals || []),
-      { type: "breakfast", description: "", targetCalories: "", suggestions: [] },
-    ]
-    setEditData({ ...editData, mealPlan: updated })
-  }
+      {
+        type: "breakfast",
+        description: "",
+        targetCalories: "",
+        suggestions: [],
+      },
+    ];
+    setEditData({ ...editData, mealPlan: updated });
+  };
 
   const removeMealFromDay = (dayIndex, mealIndex) => {
-    const updated = [...editData.mealPlan]
-    updated[dayIndex].meals = updated[dayIndex].meals.filter((_, i) => i !== mealIndex)
-    setEditData({ ...editData, mealPlan: updated })
-  }
+    const updated = [...editData.mealPlan];
+    updated[dayIndex].meals = updated[dayIndex].meals.filter(
+      (_, i) => i !== mealIndex
+    );
+    setEditData({ ...editData, mealPlan: updated });
+  };
 
   const updateMeal = (dayIndex, mealIndex, field, value) => {
-    const updated = [...editData.mealPlan]
+    const updated = [...editData.mealPlan];
     updated[dayIndex].meals[mealIndex] = {
       ...updated[dayIndex].meals[mealIndex],
       [field]: value,
-    }
-    setEditData({ ...editData, mealPlan: updated })
-  }
+    };
+    setEditData({ ...editData, mealPlan: updated });
+  };
 
   const handleDelete = async () => {
-    setDeleting(true)
+    setDeleting(true);
     try {
-      await trainerService.deletePlan(id)
-      navigate("/trainer/plans")
+      await trainerService.deletePlan(id);
+      navigate("/trainer/plans");
     } catch (error) {
-      console.error("Failed to delete plan:", error)
+      console.error("Failed to delete plan:", error);
     } finally {
-      setDeleting(false)
+      setDeleting(false);
     }
-  }
+  };
 
   const getStatusBadge = (status) => {
     const variants = {
       active: "success",
       completed: "default",
       paused: "warning",
-    }
-    return variants[status] || "default"
-  }
+    };
+    return variants[status] || "default";
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   if (!plan) {
-    return null
+    return null;
   }
 
   return (
@@ -223,7 +248,10 @@ const PlanDetail = () => {
           </div>
         </div>
         <div className="flex items-center gap-2">
-          <Badge variant={getStatusBadge(plan.status)} className="text-sm px-3 py-1">
+          <Badge
+            variant={getStatusBadge(plan.status)}
+            className="text-sm px-3 py-1"
+          >
             {plan.status}
           </Badge>
           <Button variant="outline" onClick={handleEdit}>
@@ -250,12 +278,18 @@ const PlanDetail = () => {
                 {plan.client?.name?.charAt(0).toUpperCase()}
               </div>
               <div>
-                <p className="font-semibold text-primary">{plan.client?.name}</p>
+                <p className="font-semibold text-primary">
+                  {plan.client?.name}
+                </p>
                 <p className="text-sm text-muted">{plan.client?.email}</p>
               </div>
             </div>
             <Link to={`/trainer/clients/${plan.client?._id}`}>
-              <Button variant="outline" size="sm" className="w-full bg-transparent">
+              <Button
+                variant="outline"
+                size="sm"
+                className="w-full bg-transparent"
+              >
                 <User size={16} className="mr-2" />
                 View Client Profile
               </Button>
@@ -276,7 +310,8 @@ const PlanDetail = () => {
                   <span className="text-sm text-muted">Duration</span>
                 </div>
                 <p className="font-semibold text-primary">
-                  {formatDate(plan.startDate)} - {plan.endDate ? formatDate(plan.endDate) : "Ongoing"}
+                  {formatDate(plan.startDate)} -{" "}
+                  {plan.endDate ? formatDate(plan.endDate) : "Ongoing"}
                 </p>
               </div>
 
@@ -285,7 +320,10 @@ const PlanDetail = () => {
                   <Target size={18} className="text-muted" />
                   <span className="text-sm text-muted">Status</span>
                 </div>
-                <Badge variant={getStatusBadge(plan.status)} className="text-sm">
+                <Badge
+                  variant={getStatusBadge(plan.status)}
+                  className="text-sm"
+                >
                   {plan.status}
                 </Badge>
               </div>
@@ -296,7 +334,9 @@ const PlanDetail = () => {
                     <Utensils size={18} className="text-muted" />
                     <span className="text-sm text-muted">Daily Calories</span>
                   </div>
-                  <p className="font-semibold text-primary">{plan.dailyCalorieTarget} kcal</p>
+                  <p className="font-semibold text-primary">
+                    {plan.dailyCalorieTarget} kcal
+                  </p>
                 </div>
               )}
 
@@ -306,7 +346,9 @@ const PlanDetail = () => {
                     <Target size={18} className="text-muted" />
                     <span className="text-sm text-muted">Daily Protein</span>
                   </div>
-                  <p className="font-semibold text-primary">{plan.dailyProteinTarget}g</p>
+                  <p className="font-semibold text-primary">
+                    {plan.dailyProteinTarget}g
+                  </p>
                 </div>
               )}
             </div>
@@ -348,7 +390,9 @@ const PlanDetail = () => {
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
               {plan.workoutPlan.map((day, index) => (
                 <div key={index} className="p-4 bg-gray-50 rounded-lg">
-                  <h4 className="font-semibold text-primary capitalize mb-2">{day.day}</h4>
+                  <h4 className="font-semibold text-primary capitalize mb-2">
+                    {day.day}
+                  </h4>
                   {day.isRestDay ? (
                     <p className="text-muted">Rest Day</p>
                   ) : (
@@ -356,7 +400,9 @@ const PlanDetail = () => {
                       {day.exercises?.map((exercise, i) => (
                         <li key={i} className="text-muted">
                           {exercise.name}
-                          {exercise.sets && exercise.reps && ` - ${exercise.sets}x${exercise.reps}`}
+                          {exercise.sets &&
+                            exercise.reps &&
+                            ` - ${exercise.sets}x${exercise.reps}`}
                         </li>
                       ))}
                     </ul>
@@ -369,22 +415,36 @@ const PlanDetail = () => {
       )}
 
       {/* Edit Plan Modal */}
-      <Modal isOpen={showEditModal} onClose={() => setShowEditModal(false)} title="Edit Training Plan" size="xl">
-        <form onSubmit={handleUpdate} className="space-y-6 max-h-[70vh] overflow-y-auto px-1">
+      <Modal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        title="Edit Training Plan"
+        size="xl"
+      >
+        <form
+          onSubmit={handleUpdate}
+          className="space-y-6 max-h-[70vh] overflow-y-auto px-1"
+        >
           {/* Basic Info */}
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <Input
               label="Plan Name"
               value={editData.name}
-              onChange={(e) => setEditData({ ...editData, name: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, name: e.target.value })
+              }
               required
             />
             <div>
-              <label className="block text-sm font-medium text-primary mb-1">Status</label>
+              <label className="block text-sm font-medium text-primary mb-1">
+                Status
+              </label>
               <select
                 className="w-full px-4 py-2 border border-border rounded-lg bg-white"
                 value={editData.status}
-                onChange={(e) => setEditData({ ...editData, status: e.target.value })}
+                onChange={(e) =>
+                  setEditData({ ...editData, status: e.target.value })
+                }
               >
                 <option value="active">Active</option>
                 <option value="paused">Paused</option>
@@ -396,7 +456,9 @@ const PlanDetail = () => {
           <Input
             label="Description"
             value={editData.description}
-            onChange={(e) => setEditData({ ...editData, description: e.target.value })}
+            onChange={(e) =>
+              setEditData({ ...editData, description: e.target.value })
+            }
             placeholder="Brief description"
           />
 
@@ -405,13 +467,17 @@ const PlanDetail = () => {
               label="Daily Calorie Target (kcal)"
               type="number"
               value={editData.dailyCalorieTarget}
-              onChange={(e) => setEditData({ ...editData, dailyCalorieTarget: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, dailyCalorieTarget: e.target.value })
+              }
             />
             <Input
               label="Daily Protein Target (g)"
               type="number"
               value={editData.dailyProteinTarget}
-              onChange={(e) => setEditData({ ...editData, dailyProteinTarget: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, dailyProteinTarget: e.target.value })
+              }
             />
           </div>
 
@@ -420,23 +486,31 @@ const PlanDetail = () => {
               label="Start Date"
               type="date"
               value={editData.startDate}
-              onChange={(e) => setEditData({ ...editData, startDate: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, startDate: e.target.value })
+              }
               required
             />
             <Input
               label="End Date (optional)"
               type="date"
               value={editData.endDate}
-              onChange={(e) => setEditData({ ...editData, endDate: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, endDate: e.target.value })
+              }
             />
           </div>
 
           <div>
-            <label className="block text-sm font-medium text-primary mb-1">Notes</label>
+            <label className="block text-sm font-medium text-primary mb-1">
+              Notes
+            </label>
             <textarea
               className="w-full px-4 py-2 border border-border rounded-lg bg-white min-h-[80px]"
               value={editData.notes}
-              onChange={(e) => setEditData({ ...editData, notes: e.target.value })}
+              onChange={(e) =>
+                setEditData({ ...editData, notes: e.target.value })
+              }
               placeholder="Additional notes for the client"
             />
           </div>
@@ -444,7 +518,9 @@ const PlanDetail = () => {
           {/* Workout Plan */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold text-primary">Weekly Workout Plan</h3>
+              <h3 className="font-semibold text-primary">
+                Weekly Workout Plan
+              </h3>
               <Button type="button" size="sm" onClick={addWorkoutDay}>
                 <Plus size={16} className="mr-1" />
                 Add Day
@@ -452,12 +528,17 @@ const PlanDetail = () => {
             </div>
             <div className="space-y-3">
               {editData.workoutPlan.map((day, dayIndex) => (
-                <div key={dayIndex} className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                <div
+                  key={dayIndex}
+                  className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <select
                       className="px-3 py-1.5 border border-border rounded-lg bg-white text-sm capitalize"
                       value={day.day}
-                      onChange={(e) => updateWorkoutDay(dayIndex, "day", e.target.value)}
+                      onChange={(e) =>
+                        updateWorkoutDay(dayIndex, "day", e.target.value)
+                      }
                     >
                       <option value="monday">Monday</option>
                       <option value="tuesday">Tuesday</option>
@@ -472,11 +553,22 @@ const PlanDetail = () => {
                         <input
                           type="checkbox"
                           checked={day.isRestDay}
-                          onChange={(e) => updateWorkoutDay(dayIndex, "isRestDay", e.target.checked)}
+                          onChange={(e) =>
+                            updateWorkoutDay(
+                              dayIndex,
+                              "isRestDay",
+                              e.target.checked
+                            )
+                          }
                         />
                         Rest Day
                       </label>
-                      <Button type="button" variant="ghost" size="sm" onClick={() => removeWorkoutDay(dayIndex)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeWorkoutDay(dayIndex)}
+                      >
                         <X size={16} />
                       </Button>
                     </div>
@@ -495,14 +587,21 @@ const PlanDetail = () => {
                       </Button>
                       <div className="space-y-2">
                         {day.exercises?.map((exercise, exIndex) => (
-                          <div key={exIndex} className="p-3 bg-white rounded border border-gray-200">
+                          <div
+                            key={exIndex}
+                            className="p-3 bg-white rounded border border-gray-200"
+                          >
                             <div className="flex justify-between items-start mb-2">
-                              <span className="text-xs text-muted">Exercise {exIndex + 1}</span>
+                              <span className="text-xs text-muted">
+                                Exercise {exIndex + 1}
+                              </span>
                               <Button
                                 type="button"
                                 variant="ghost"
                                 size="sm"
-                                onClick={() => removeExerciseFromDay(dayIndex, exIndex)}
+                                onClick={() =>
+                                  removeExerciseFromDay(dayIndex, exIndex)
+                                }
                               >
                                 <X size={14} />
                               </Button>
@@ -512,41 +611,83 @@ const PlanDetail = () => {
                                 className="px-2 py-1.5 border border-border rounded text-sm col-span-2"
                                 placeholder="Exercise name"
                                 value={exercise.name}
-                                onChange={(e) => updateExercise(dayIndex, exIndex, "name", e.target.value)}
+                                onChange={(e) =>
+                                  updateExercise(
+                                    dayIndex,
+                                    exIndex,
+                                    "name",
+                                    e.target.value
+                                  )
+                                }
                               />
                               <input
                                 className="px-2 py-1.5 border border-border rounded text-sm"
                                 placeholder="Sets"
                                 type="number"
                                 value={exercise.sets}
-                                onChange={(e) => updateExercise(dayIndex, exIndex, "sets", e.target.value)}
+                                onChange={(e) =>
+                                  updateExercise(
+                                    dayIndex,
+                                    exIndex,
+                                    "sets",
+                                    e.target.value
+                                  )
+                                }
                               />
                               <input
                                 className="px-2 py-1.5 border border-border rounded text-sm"
                                 placeholder="Reps"
                                 type="number"
                                 value={exercise.reps}
-                                onChange={(e) => updateExercise(dayIndex, exIndex, "reps", e.target.value)}
+                                onChange={(e) =>
+                                  updateExercise(
+                                    dayIndex,
+                                    exIndex,
+                                    "reps",
+                                    e.target.value
+                                  )
+                                }
                               />
                               <input
                                 className="px-2 py-1.5 border border-border rounded text-sm"
                                 placeholder="Weight (kg)"
                                 type="number"
                                 value={exercise.weight}
-                                onChange={(e) => updateExercise(dayIndex, exIndex, "weight", e.target.value)}
+                                onChange={(e) =>
+                                  updateExercise(
+                                    dayIndex,
+                                    exIndex,
+                                    "weight",
+                                    e.target.value
+                                  )
+                                }
                               />
                               <input
                                 className="px-2 py-1.5 border border-border rounded text-sm"
                                 placeholder="Duration (min)"
                                 type="number"
                                 value={exercise.duration}
-                                onChange={(e) => updateExercise(dayIndex, exIndex, "duration", e.target.value)}
+                                onChange={(e) =>
+                                  updateExercise(
+                                    dayIndex,
+                                    exIndex,
+                                    "duration",
+                                    e.target.value
+                                  )
+                                }
                               />
                               <input
                                 className="px-2 py-1.5 border border-border rounded text-sm col-span-2"
                                 placeholder="Notes"
                                 value={exercise.notes}
-                                onChange={(e) => updateExercise(dayIndex, exIndex, "notes", e.target.value)}
+                                onChange={(e) =>
+                                  updateExercise(
+                                    dayIndex,
+                                    exIndex,
+                                    "notes",
+                                    e.target.value
+                                  )
+                                }
                               />
                             </div>
                           </div>
@@ -570,12 +711,17 @@ const PlanDetail = () => {
             </div>
             <div className="space-y-3">
               {editData.mealPlan.map((day, dayIndex) => (
-                <div key={dayIndex} className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                <div
+                  key={dayIndex}
+                  className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200"
+                >
                   <div className="flex items-center justify-between mb-3">
                     <select
                       className="px-3 py-1.5 border border-border rounded-lg bg-white text-sm capitalize"
                       value={day.day}
-                      onChange={(e) => updateMealDay(dayIndex, "day", e.target.value)}
+                      onChange={(e) =>
+                        updateMealDay(dayIndex, "day", e.target.value)
+                      }
                     >
                       <option value="monday">Monday</option>
                       <option value="tuesday">Tuesday</option>
@@ -585,7 +731,12 @@ const PlanDetail = () => {
                       <option value="saturday">Saturday</option>
                       <option value="sunday">Sunday</option>
                     </select>
-                    <Button type="button" variant="ghost" size="sm" onClick={() => removeMealDay(dayIndex)}>
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => removeMealDay(dayIndex)}
+                    >
                       <X size={16} />
                     </Button>
                   </div>
@@ -601,12 +752,22 @@ const PlanDetail = () => {
                   </Button>
                   <div className="space-y-2">
                     {day.meals?.map((meal, mealIndex) => (
-                      <div key={mealIndex} className="p-3 bg-white rounded border border-gray-200">
+                      <div
+                        key={mealIndex}
+                        className="p-3 bg-white rounded border border-gray-200"
+                      >
                         <div className="flex justify-between items-start mb-2">
                           <select
                             className="px-2 py-1.5 border border-border rounded text-sm capitalize"
                             value={meal.type}
-                            onChange={(e) => updateMeal(dayIndex, mealIndex, "type", e.target.value)}
+                            onChange={(e) =>
+                              updateMeal(
+                                dayIndex,
+                                mealIndex,
+                                "type",
+                                e.target.value
+                              )
+                            }
                           >
                             <option value="breakfast">Breakfast</option>
                             <option value="lunch">Lunch</option>
@@ -617,7 +778,9 @@ const PlanDetail = () => {
                             type="button"
                             variant="ghost"
                             size="sm"
-                            onClick={() => removeMealFromDay(dayIndex, mealIndex)}
+                            onClick={() =>
+                              removeMealFromDay(dayIndex, mealIndex)
+                            }
                           >
                             <X size={14} />
                           </Button>
@@ -627,14 +790,28 @@ const PlanDetail = () => {
                             className="w-full px-2 py-1.5 border border-border rounded text-sm"
                             placeholder="Description"
                             value={meal.description}
-                            onChange={(e) => updateMeal(dayIndex, mealIndex, "description", e.target.value)}
+                            onChange={(e) =>
+                              updateMeal(
+                                dayIndex,
+                                mealIndex,
+                                "description",
+                                e.target.value
+                              )
+                            }
                           />
                           <input
                             className="w-full px-2 py-1.5 border border-border rounded text-sm"
                             placeholder="Target calories"
                             type="number"
                             value={meal.targetCalories}
-                            onChange={(e) => updateMeal(dayIndex, mealIndex, "targetCalories", e.target.value)}
+                            onChange={(e) =>
+                              updateMeal(
+                                dayIndex,
+                                mealIndex,
+                                "targetCalories",
+                                e.target.value
+                              )
+                            }
                           />
                           <textarea
                             className="w-full px-2 py-1.5 border border-border rounded text-sm"
@@ -646,7 +823,9 @@ const PlanDetail = () => {
                                 dayIndex,
                                 mealIndex,
                                 "suggestions",
-                                e.target.value.split("\n").filter((s) => s.trim()),
+                                e.target.value
+                                  .split("\n")
+                                  .filter((s) => s.trim())
                               )
                             }
                           />
@@ -660,7 +839,11 @@ const PlanDetail = () => {
           </div>
 
           <div className="flex gap-3 justify-end pt-4 border-t">
-            <Button type="button" variant="outline" onClick={() => setShowEditModal(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowEditModal(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" loading={updating}>
@@ -671,9 +854,15 @@ const PlanDetail = () => {
       </Modal>
 
       {/* Delete Confirmation Modal */}
-      <Modal isOpen={showDeleteModal} onClose={() => setShowDeleteModal(false)} title="Delete Plan" size="sm">
+      <Modal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        title="Delete Plan"
+        size="sm"
+      >
         <p className="text-muted mb-6">
-          Are you sure you want to delete this training plan? This action cannot be undone.
+          Are you sure you want to delete this training plan? This action cannot
+          be undone.
         </p>
         <div className="flex gap-3 justify-end">
           <Button variant="outline" onClick={() => setShowDeleteModal(false)}>
@@ -685,7 +874,7 @@ const PlanDetail = () => {
         </div>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default PlanDetail
+export default PlanDetail;

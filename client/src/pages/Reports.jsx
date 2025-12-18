@@ -1,6 +1,4 @@
-"use client"
-
-import { useState, useEffect } from "react"
+import { useState, useEffect } from "react";
 import {
   LineChart,
   Line,
@@ -14,64 +12,76 @@ import {
   Legend,
   AreaChart,
   Area,
-} from "recharts"
-import { FileText, TrendingUp, Dumbbell, Utensils, Scale, Target } from "lucide-react"
-import Card from "../components/ui/Card"
-import Input from "../components/ui/Input"
-import Badge from "../components/ui/Badge"
-import ProgressBar from "../components/ui/ProgressBar"
-import { reportService } from "../services/reports"
-import { formatDate, formatNumber } from "../utils/helpers"
+} from "recharts";
+import {
+  FileText,
+  TrendingUp,
+  Dumbbell,
+  Utensils,
+  Scale,
+  Target,
+} from "lucide-react";
+import Card from "../components/ui/Card";
+import Input from "../components/ui/Input";
+import Badge from "../components/ui/Badge";
+import ProgressBar from "../components/ui/ProgressBar";
+import { reportService } from "../services/reports";
+import { formatDate, formatNumber } from "../utils/helpers";
 
 const Reports = () => {
-  const [loading, setLoading] = useState(true)
-  const [report, setReport] = useState(null)
-  const [weeklyData, setWeeklyData] = useState([])
-  const [calorieData, setCalorieData] = useState(null)
+  const [loading, setLoading] = useState(true);
+  const [report, setReport] = useState(null);
+  const [weeklyData, setWeeklyData] = useState([]);
+  const [calorieData, setCalorieData] = useState(null);
   const [dateRange, setDateRange] = useState({
-    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+    startDate: new Date(Date.now() - 30 * 24 * 60 * 60 * 1000)
+      .toISOString()
+      .split("T")[0],
     endDate: new Date().toISOString().split("T")[0],
-  })
+  });
 
   useEffect(() => {
-    fetchReportData()
-  }, [dateRange])
+    fetchReportData();
+  }, [dateRange]);
 
   const fetchReportData = async () => {
-    setLoading(true)
+    setLoading(true);
     try {
       const [summaryData, weeklyStats, dailyCalories] = await Promise.all([
         reportService.getSummary(dateRange.startDate, dateRange.endDate),
         reportService.getWeekly(4),
         reportService.getDailyCalories(14),
-      ])
+      ]);
 
-      setReport(summaryData)
-      setWeeklyData(weeklyStats)
-      setCalorieData(dailyCalories)
+      setReport(summaryData);
+      setWeeklyData(weeklyStats);
+      setCalorieData(dailyCalories);
     } catch (error) {
-      console.error("Failed to fetch report data:", error)
+      console.error("Failed to fetch report data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   // Prepare calorie in/out chart data
-  const calorieChartData = []
+  const calorieChartData = [];
   if (calorieData) {
     const allDates = [
-      ...new Set([...calorieData.caloriesIn.map((d) => d._id), ...calorieData.caloriesOut.map((d) => d._id)]),
-    ].sort()
+      ...new Set([
+        ...calorieData.caloriesIn.map((d) => d._id),
+        ...calorieData.caloriesOut.map((d) => d._id),
+      ]),
+    ].sort();
 
     allDates.forEach((date) => {
-      const inData = calorieData.caloriesIn.find((d) => d._id === date)
-      const outData = calorieData.caloriesOut.find((d) => d._id === date)
+      const inData = calorieData.caloriesIn.find((d) => d._id === date);
+      const outData = calorieData.caloriesOut.find((d) => d._id === date);
       calorieChartData.push({
         date: date.slice(-5),
         consumed: inData?.calories || 0,
         burned: outData?.calories || 0,
-      })
-    })
+      });
+    });
   }
 
   // Prepare weekly workout chart data
@@ -80,14 +90,14 @@ const Reports = () => {
     workouts: week.workouts,
     duration: week.duration,
     calories: week.calories,
-  }))
+  }));
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -96,21 +106,27 @@ const Reports = () => {
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
           <h1 className="text-2xl font-bold text-primary">Progress Reports</h1>
-          <p className="text-muted">Comprehensive view of your fitness journey</p>
+          <p className="text-muted">
+            Comprehensive view of your fitness journey
+          </p>
         </div>
         <div className="flex items-center gap-2">
           <div className="flex items-center gap-2">
             <Input
               type="date"
               value={dateRange.startDate}
-              onChange={(e) => setDateRange({ ...dateRange, startDate: e.target.value })}
+              onChange={(e) =>
+                setDateRange({ ...dateRange, startDate: e.target.value })
+              }
               className="w-36"
             />
             <span className="text-muted">to</span>
             <Input
               type="date"
               value={dateRange.endDate}
-              onChange={(e) => setDateRange({ ...dateRange, endDate: e.target.value })}
+              onChange={(e) =>
+                setDateRange({ ...dateRange, endDate: e.target.value })
+              }
               className="w-36"
             />
           </div>
@@ -126,7 +142,9 @@ const Reports = () => {
             </div>
             <div>
               <p className="text-sm text-muted">Total Workouts</p>
-              <p className="text-xl font-bold text-primary">{report?.workoutStats?.totalWorkouts || 0}</p>
+              <p className="text-xl font-bold text-primary">
+                {report?.workoutStats?.totalWorkouts || 0}
+              </p>
             </div>
           </div>
         </Card>
@@ -138,7 +156,9 @@ const Reports = () => {
             </div>
             <div>
               <p className="text-sm text-muted">Workout Minutes</p>
-              <p className="text-xl font-bold text-primary">{formatNumber(report?.workoutStats?.totalDuration || 0)}</p>
+              <p className="text-xl font-bold text-primary">
+                {formatNumber(report?.workoutStats?.totalDuration || 0)}
+              </p>
             </div>
           </div>
         </Card>
@@ -150,7 +170,9 @@ const Reports = () => {
             </div>
             <div>
               <p className="text-sm text-muted">Avg Daily Calories</p>
-              <p className="text-xl font-bold text-primary">{report?.nutritionStats?.avgDailyCalories || 0}</p>
+              <p className="text-xl font-bold text-primary">
+                {report?.nutritionStats?.avgDailyCalories || 0}
+              </p>
             </div>
           </div>
         </Card>
@@ -164,7 +186,9 @@ const Reports = () => {
               <p className="text-sm text-muted">Weight Change</p>
               <p className="text-xl font-bold text-primary">
                 {report?.weightProgress
-                  ? `${report.weightProgress.change > 0 ? "+" : ""}${report.weightProgress.change.toFixed(1)} kg`
+                  ? `${
+                      report.weightProgress.change > 0 ? "+" : ""
+                    }${report.weightProgress.change.toFixed(1)} kg`
                   : "N/A"}
               </p>
             </div>
@@ -186,7 +210,11 @@ const Reports = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <AreaChart data={calorieChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#737373" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 12 }}
+                      stroke="#737373"
+                    />
                     <YAxis tick={{ fontSize: 12 }} stroke="#737373" />
                     <Tooltip
                       contentStyle={{
@@ -235,7 +263,11 @@ const Reports = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <BarChart data={weeklyChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                    <XAxis dataKey="week" tick={{ fontSize: 12 }} stroke="#737373" />
+                    <XAxis
+                      dataKey="week"
+                      tick={{ fontSize: 12 }}
+                      stroke="#737373"
+                    />
                     <YAxis tick={{ fontSize: 12 }} stroke="#737373" />
                     <Tooltip
                       contentStyle={{
@@ -245,8 +277,18 @@ const Reports = () => {
                       }}
                     />
                     <Legend />
-                    <Bar dataKey="workouts" fill="#000" name="Workouts" radius={[4, 4, 0, 0]} />
-                    <Bar dataKey="duration" fill="#737373" name="Minutes" radius={[4, 4, 0, 0]} />
+                    <Bar
+                      dataKey="workouts"
+                      fill="#000"
+                      name="Workouts"
+                      radius={[4, 4, 0, 0]}
+                    />
+                    <Bar
+                      dataKey="duration"
+                      fill="#737373"
+                      name="Minutes"
+                      radius={[4, 4, 0, 0]}
+                    />
                   </BarChart>
                 </ResponsiveContainer>
               </div>
@@ -265,7 +307,8 @@ const Reports = () => {
           <Card.Header>
             <Card.Title>Weight Progress</Card.Title>
             <Card.Description>
-              From {report.weightProgress.startWeight}kg to {report.weightProgress.currentWeight}kg
+              From {report.weightProgress.startWeight}kg to{" "}
+              {report.weightProgress.currentWeight}kg
             </Card.Description>
           </Card.Header>
           <Card.Content>
@@ -273,13 +316,25 @@ const Reports = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart
                   data={report.weightProgress.trend.map((log) => ({
-                    date: formatDate(log.date, { month: "short", day: "numeric" }),
+                    date: formatDate(log.date, {
+                      month: "short",
+                      day: "numeric",
+                    }),
                     weight: log.weight,
                   }))}
                 >
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#737373" />
-                  <YAxis domain={["dataMin - 1", "dataMax + 1"]} tick={{ fontSize: 12 }} stroke="#737373" unit=" kg" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    stroke="#737373"
+                  />
+                  <YAxis
+                    domain={["dataMin - 1", "dataMax + 1"]}
+                    tick={{ fontSize: 12 }}
+                    stroke="#737373"
+                    unit=" kg"
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#fff",
@@ -307,11 +362,17 @@ const Reports = () => {
           <div className="flex items-center justify-between">
             <div>
               <Card.Title>Goals Overview</Card.Title>
-              <Card.Description>Track your fitness goal progress</Card.Description>
+              <Card.Description>
+                Track your fitness goal progress
+              </Card.Description>
             </div>
             <div className="flex gap-2">
-              <Badge variant="success">{report?.goalsSummary?.completed || 0} Completed</Badge>
-              <Badge variant="warning">{report?.goalsSummary?.active || 0} Active</Badge>
+              <Badge variant="success">
+                {report?.goalsSummary?.completed || 0} Completed
+              </Badge>
+              <Badge variant="warning">
+                {report?.goalsSummary?.active || 0} Active
+              </Badge>
             </div>
           </div>
         </Card.Header>
@@ -330,9 +391,18 @@ const Reports = () => {
                         {goal.currentValue} / {goal.targetValue} {goal.unit}
                       </span>
                     </div>
-                    <ProgressBar value={goal.currentValue} max={goal.targetValue} />
+                    <ProgressBar
+                      value={goal.currentValue}
+                      max={goal.targetValue}
+                    />
                   </div>
-                  <Badge variant={goal.status === "completed" ? "success" : "warning"}>{goal.status}</Badge>
+                  <Badge
+                    variant={
+                      goal.status === "completed" ? "success" : "warning"
+                    }
+                  >
+                    {goal.status}
+                  </Badge>
                 </div>
               ))}
             </div>
@@ -355,7 +425,8 @@ const Reports = () => {
             <div>
               <Card.Title>Report Summary</Card.Title>
               <Card.Description>
-                Period: {formatDate(dateRange.startDate)} - {formatDate(dateRange.endDate)}
+                Period: {formatDate(dateRange.startDate)} -{" "}
+                {formatDate(dateRange.endDate)}
               </Card.Description>
             </div>
           </div>
@@ -363,7 +434,9 @@ const Reports = () => {
         <Card.Content>
           <div className="grid grid-cols-2 md:grid-cols-4 gap-6">
             <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <p className="text-3xl font-bold text-primary">{report?.workoutStats?.totalWorkouts || 0}</p>
+              <p className="text-3xl font-bold text-primary">
+                {report?.workoutStats?.totalWorkouts || 0}
+              </p>
               <p className="text-sm text-muted">Workouts Completed</p>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
@@ -373,18 +446,22 @@ const Reports = () => {
               <p className="text-sm text-muted">Calories Burned</p>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <p className="text-3xl font-bold text-primary">{report?.nutritionStats?.totalMealsLogged || 0}</p>
+              <p className="text-3xl font-bold text-primary">
+                {report?.nutritionStats?.totalMealsLogged || 0}
+              </p>
               <p className="text-sm text-muted">Meals Logged</p>
             </div>
             <div className="text-center p-4 bg-gray-50 rounded-lg">
-              <p className="text-3xl font-bold text-primary">{report?.workoutStats?.avgWorkoutsPerWeek || 0}</p>
+              <p className="text-3xl font-bold text-primary">
+                {report?.workoutStats?.avgWorkoutsPerWeek || 0}
+              </p>
               <p className="text-sm text-muted">Avg Workouts/Week</p>
             </div>
           </div>
         </Card.Content>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default Reports
+export default Reports;

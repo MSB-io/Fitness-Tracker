@@ -1,17 +1,35 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Plus, Utensils, Trash2, Coffee, Sun, Moon, Cookie, Flame } from "lucide-react"
-import { PieChart, Pie, Cell, ResponsiveContainer, BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip } from "recharts"
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Input from "../components/ui/Input"
-import Modal from "../components/ui/Modal"
-import EmptyState from "../components/ui/EmptyState"
-import ProgressBar from "../components/ui/ProgressBar"
-import IndianFoodSelector from "../components/IndianFoodSelector"
-import { mealService } from "../services/meals"
-import { formatDate, formatNumber } from "../utils/helpers"
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  Utensils,
+  Trash2,
+  Coffee,
+  Sun,
+  Moon,
+  Cookie,
+  Flame,
+} from "lucide-react";
+import {
+  PieChart,
+  Pie,
+  Cell,
+  ResponsiveContainer,
+  BarChart,
+  Bar,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+} from "recharts";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Modal from "../components/ui/Modal";
+import EmptyState from "../components/ui/EmptyState";
+import ProgressBar from "../components/ui/ProgressBar";
+import IndianFoodSelector from "../components/IndianFoodSelector";
+import { mealService } from "../services/meals";
+import { formatDate, formatNumber } from "../utils/helpers";
 
 const mealTypes = [
   { value: "breakfast", label: "Breakfast", icon: Coffee },
@@ -19,7 +37,7 @@ const mealTypes = [
   { value: "dinner", label: "Dinner", icon: Moon },
   { value: "snack", label: "Snack", icon: Cookie },
   { value: "evening-snack", label: "Evening Snack", icon: Cookie },
-]
+];
 
 const foodTypes = [
   { value: "all", label: "All Foods" },
@@ -27,23 +45,25 @@ const foodTypes = [
   { value: "vegan", label: "Vegan" },
   { value: "non-vegetarian", label: "Non-Vegetarian" },
   { value: "eggetarian", label: "Eggetarian" },
-]
+];
 
 const Nutrition = () => {
-  const [meals, setMeals] = useState([])
-  const [todayMeals, setTodayMeals] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [weeklyStats, setWeeklyStats] = useState([])
-  const [deleting, setDeleting] = useState(null)
-  const [submitting, setSubmitting] = useState(false)
+  const [meals, setMeals] = useState([]);
+  const [todayMeals, setTodayMeals] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [weeklyStats, setWeeklyStats] = useState([]);
+  const [deleting, setDeleting] = useState(null);
+  const [submitting, setSubmitting] = useState(false);
 
   const [formData, setFormData] = useState({
     type: "breakfast",
     date: new Date().toISOString().split("T")[0],
     notes: "",
-    foods: [{ name: "", calories: "", protein: "", carbs: "", fat: "", quantity: 1 }],
-  })
+    foods: [
+      { name: "", calories: "", protein: "", carbs: "", fat: "", quantity: 1 },
+    ],
+  });
 
   // Daily targets (adjusted for typical Indian diet - higher carbs, moderate protein)
   const targets = {
@@ -51,11 +71,11 @@ const Nutrition = () => {
     protein: 100, // Adjusted for vegetarian-heavy Indian diet
     carbs: 300, // Higher for rice/roti-based diet
     fat: 55,
-  }
+  };
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
@@ -63,55 +83,65 @@ const Nutrition = () => {
         mealService.getAll({ limit: 20 }),
         mealService.getToday(),
         mealService.getStats(7),
-      ])
+      ]);
 
-      setMeals(mealsResponse.meals || [])
-      setTodayMeals(todayResponse)
-      setWeeklyStats(statsResponse || [])
+      setMeals(mealsResponse.meals || []);
+      setTodayMeals(todayResponse);
+      setWeeklyStats(statsResponse || []);
     } catch (error) {
-      console.error("Failed to fetch nutrition data:", error)
+      console.error("Failed to fetch nutrition data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleAddFood = () => {
     setFormData({
       ...formData,
-      foods: [...formData.foods, { name: "", calories: "", protein: "", carbs: "", fat: "", quantity: 1 }],
-    })
-  }
+      foods: [
+        ...formData.foods,
+        {
+          name: "",
+          calories: "",
+          protein: "",
+          carbs: "",
+          fat: "",
+          quantity: 1,
+        },
+      ],
+    });
+  };
 
   const handleRemoveFood = (index) => {
     if (formData.foods.length > 1) {
       setFormData({
         ...formData,
         foods: formData.foods.filter((_, i) => i !== index),
-      })
+      });
     }
-  }
+  };
 
   const handleFoodChange = (index, field, value) => {
-    const newFoods = [...formData.foods]
-    newFoods[index][field] = value
-    setFormData({ ...formData, foods: newFoods })
-  }
+    const newFoods = [...formData.foods];
+    newFoods[index][field] = value;
+    setFormData({ ...formData, foods: newFoods });
+  };
 
   const handleSelectIndianFood = (food) => {
     // Replace the last empty food item or add a new one
-    const lastFood = formData.foods[formData.foods.length - 1]
+    const lastFood = formData.foods[formData.foods.length - 1];
     if (lastFood.name === "" && lastFood.calories === "") {
-      const newFoods = [...formData.foods]
-      newFoods[newFoods.length - 1] = food
-      setFormData({ ...formData, foods: newFoods })
+      const newFoods = [...formData.foods];
+      newFoods[newFoods.length - 1] = food;
+      setFormData({ ...formData, foods: newFoods });
     } else {
-      setFormData({ ...formData, foods: [...formData.foods, food] })
+      setFormData({ ...formData, foods: [...formData.foods, food] });
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
 
     try {
       const payload = {
@@ -126,40 +156,49 @@ const Nutrition = () => {
           fat: Number.parseFloat(food.fat) || 0,
           quantity: Number.parseInt(food.quantity) || 1,
         })),
-      }
+      };
 
-      await mealService.create(payload)
-      setShowModal(false)
+      await mealService.create(payload);
+      setShowModal(false);
       setFormData({
         type: "breakfast",
         date: new Date().toISOString().split("T")[0],
         notes: "",
-        foods: [{ name: "", calories: "", protein: "", carbs: "", fat: "", quantity: 1 }],
-      })
-      fetchData()
+        foods: [
+          {
+            name: "",
+            calories: "",
+            protein: "",
+            carbs: "",
+            fat: "",
+            quantity: 1,
+          },
+        ],
+      });
+      fetchData();
     } catch (error) {
-      console.error("Failed to create meal:", error)
+      console.error("Failed to create meal:", error);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
-    setDeleting(id)
+    setDeleting(id);
     try {
-      await mealService.delete(id)
-      fetchData()
+      await mealService.delete(id);
+      fetchData();
     } catch (error) {
-      console.error("Failed to delete meal:", error)
+      console.error("Failed to delete meal:", error);
     } finally {
-      setDeleting(null)
+      setDeleting(null);
     }
-  }
+  };
 
   const getMealIcon = (type) => {
-    const meal = mealTypes.find((m) => m.value === type)
-    return meal?.icon || Utensils
-  }
+    const meal = mealTypes.find((m) => m.value === type);
+    return meal?.icon || Utensils;
+  };
 
   const getMealColor = (type) => {
     const colors = {
@@ -167,9 +206,9 @@ const Nutrition = () => {
       lunch: "bg-orange-100 text-orange-700",
       dinner: "bg-blue-100 text-blue-700",
       snack: "bg-green-100 text-green-700",
-    }
-    return colors[type] || "bg-gray-100 text-gray-700"
-  }
+    };
+    return colors[type] || "bg-gray-100 text-gray-700";
+  };
 
   // Prepare macro pie chart data
   const macroData = todayMeals?.totals
@@ -178,20 +217,20 @@ const Nutrition = () => {
         { name: "Carbs", value: todayMeals.totals.carbs, color: "#22c55e" },
         { name: "Fat", value: todayMeals.totals.fat, color: "#f59e0b" },
       ]
-    : []
+    : [];
 
   // Prepare weekly chart data
   const chartData = weeklyStats.map((day) => ({
     date: day._id.slice(-5),
     calories: day.dailyCalories,
-  }))
+  }));
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -222,10 +261,14 @@ const Nutrition = () => {
                   <div className="flex justify-between text-sm mb-1">
                     <span className="text-muted">Calories</span>
                     <span className="font-medium">
-                      {todayMeals?.totals?.calories || 0} / {targets.calories} kcal
+                      {todayMeals?.totals?.calories || 0} / {targets.calories}{" "}
+                      kcal
                     </span>
                   </div>
-                  <ProgressBar value={todayMeals?.totals?.calories || 0} max={targets.calories} />
+                  <ProgressBar
+                    value={todayMeals?.totals?.calories || 0}
+                    max={targets.calories}
+                  />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
@@ -234,7 +277,10 @@ const Nutrition = () => {
                       {todayMeals?.totals?.protein || 0} / {targets.protein} g
                     </span>
                   </div>
-                  <ProgressBar value={todayMeals?.totals?.protein || 0} max={targets.protein} />
+                  <ProgressBar
+                    value={todayMeals?.totals?.protein || 0}
+                    max={targets.protein}
+                  />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
@@ -243,7 +289,10 @@ const Nutrition = () => {
                       {todayMeals?.totals?.carbs || 0} / {targets.carbs} g
                     </span>
                   </div>
-                  <ProgressBar value={todayMeals?.totals?.carbs || 0} max={targets.carbs} />
+                  <ProgressBar
+                    value={todayMeals?.totals?.carbs || 0}
+                    max={targets.carbs}
+                  />
                 </div>
                 <div>
                   <div className="flex justify-between text-sm mb-1">
@@ -252,7 +301,10 @@ const Nutrition = () => {
                       {todayMeals?.totals?.fat || 0} / {targets.fat} g
                     </span>
                   </div>
-                  <ProgressBar value={todayMeals?.totals?.fat || 0} max={targets.fat} />
+                  <ProgressBar
+                    value={todayMeals?.totals?.fat || 0}
+                    max={targets.fat}
+                  />
                 </div>
               </div>
 
@@ -263,7 +315,14 @@ const Nutrition = () => {
                     <div className="h-40 w-full">
                       <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
-                          <Pie data={macroData} cx="50%" cy="50%" innerRadius={40} outerRadius={60} dataKey="value">
+                          <Pie
+                            data={macroData}
+                            cx="50%"
+                            cy="50%"
+                            innerRadius={40}
+                            outerRadius={60}
+                            dataKey="value"
+                          >
                             {macroData.map((entry, index) => (
                               <Cell key={`cell-${index}`} fill={entry.color} />
                             ))}
@@ -274,8 +333,14 @@ const Nutrition = () => {
                     </div>
                     <div className="flex gap-4 mt-2">
                       {macroData.map((macro) => (
-                        <div key={macro.name} className="flex items-center gap-1 text-xs">
-                          <div className="w-3 h-3 rounded-full" style={{ backgroundColor: macro.color }} />
+                        <div
+                          key={macro.name}
+                          className="flex items-center gap-1 text-xs"
+                        >
+                          <div
+                            className="w-3 h-3 rounded-full"
+                            style={{ backgroundColor: macro.color }}
+                          />
                           <span>{macro.name}</span>
                         </div>
                       ))}
@@ -302,13 +367,19 @@ const Nutrition = () => {
               <div className="w-24 h-24 mx-auto bg-gray-100 rounded-full flex items-center justify-center mb-4">
                 <Flame size={40} className="text-orange-500" />
               </div>
-              <p className="text-3xl font-bold text-primary">{formatNumber(todayMeals?.totals?.calories || 0)}</p>
+              <p className="text-3xl font-bold text-primary">
+                {formatNumber(todayMeals?.totals?.calories || 0)}
+              </p>
               <p className="text-muted">kcal consumed today</p>
               <div className="mt-4 pt-4 border-t border-border">
                 <p className="text-sm text-muted">
                   {targets.calories - (todayMeals?.totals?.calories || 0) > 0
-                    ? `${targets.calories - (todayMeals?.totals?.calories || 0)} kcal remaining`
-                    : `${(todayMeals?.totals?.calories || 0) - targets.calories} kcal over target`}
+                    ? `${
+                        targets.calories - (todayMeals?.totals?.calories || 0)
+                      } kcal remaining`
+                    : `${
+                        (todayMeals?.totals?.calories || 0) - targets.calories
+                      } kcal over target`}
                 </p>
               </div>
             </div>
@@ -327,7 +398,11 @@ const Nutrition = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <BarChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#737373" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    stroke="#737373"
+                  />
                   <YAxis tick={{ fontSize: 12 }} stroke="#737373" />
                   <Tooltip
                     contentStyle={{
@@ -353,31 +428,43 @@ const Nutrition = () => {
           {todayMeals?.meals?.length > 0 ? (
             <div className="space-y-3">
               {todayMeals.meals.map((meal) => {
-                const Icon = getMealIcon(meal.type)
+                const Icon = getMealIcon(meal.type);
                 return (
-                  <div key={meal._id} className="flex items-center justify-between p-4 bg-gray-50 rounded-lg">
+                  <div
+                    key={meal._id}
+                    className="flex items-center justify-between p-4 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-4">
                       <div
-                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${getMealColor(meal.type)}`}
+                        className={`w-10 h-10 rounded-lg flex items-center justify-center ${getMealColor(
+                          meal.type
+                        )}`}
                       >
                         <Icon size={20} />
                       </div>
                       <div>
-                        <p className="font-medium text-primary capitalize">{meal.type}</p>
+                        <p className="font-medium text-primary capitalize">
+                          {meal.type}
+                        </p>
                         <p className="text-sm text-muted">
                           {meal.foods
                             .map((f) => f.name)
                             .join(", ")
                             .slice(0, 50)}
-                          {meal.foods.map((f) => f.name).join(", ").length > 50 ? "..." : ""}
+                          {meal.foods.map((f) => f.name).join(", ").length > 50
+                            ? "..."
+                            : ""}
                         </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
                       <div className="text-right hidden sm:block">
-                        <p className="font-medium text-primary">{meal.totalCalories} kcal</p>
+                        <p className="font-medium text-primary">
+                          {meal.totalCalories} kcal
+                        </p>
                         <p className="text-sm text-muted">
-                          P: {meal.totalProtein}g | C: {meal.totalCarbs}g | F: {meal.totalFat}g
+                          P: {meal.totalProtein}g | C: {meal.totalCarbs}g | F:{" "}
+                          {meal.totalFat}g
                         </p>
                       </div>
                       <Button
@@ -390,7 +477,7 @@ const Nutrition = () => {
                       </Button>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           ) : (
@@ -418,21 +505,34 @@ const Nutrition = () => {
           <Card.Content>
             <div className="space-y-2">
               {meals.slice(0, 10).map((meal) => {
-                const Icon = getMealIcon(meal.type)
+                const Icon = getMealIcon(meal.type);
                 return (
-                  <div key={meal._id} className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg">
+                  <div
+                    key={meal._id}
+                    className="flex items-center justify-between p-3 hover:bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
-                      <div className={`w-8 h-8 rounded-lg flex items-center justify-center ${getMealColor(meal.type)}`}>
+                      <div
+                        className={`w-8 h-8 rounded-lg flex items-center justify-center ${getMealColor(
+                          meal.type
+                        )}`}
+                      >
                         <Icon size={16} />
                       </div>
                       <div>
-                        <p className="font-medium text-primary capitalize">{meal.type}</p>
-                        <p className="text-sm text-muted">{formatDate(meal.date)}</p>
+                        <p className="font-medium text-primary capitalize">
+                          {meal.type}
+                        </p>
+                        <p className="text-sm text-muted">
+                          {formatDate(meal.date)}
+                        </p>
                       </div>
                     </div>
-                    <p className="font-medium text-primary">{meal.totalCalories} kcal</p>
+                    <p className="font-medium text-primary">
+                      {meal.totalCalories} kcal
+                    </p>
                   </div>
-                )
+                );
               })}
             </div>
           </Card.Content>
@@ -440,15 +540,24 @@ const Nutrition = () => {
       )}
 
       {/* Add Meal Modal */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Log Meal" size="lg">
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Log Meal"
+        size="lg"
+      >
         <form onSubmit={handleSubmit} className="space-y-6">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm font-medium text-primary mb-1">Meal Type</label>
+              <label className="block text-sm font-medium text-primary mb-1">
+                Meal Type
+              </label>
               <select
                 className="w-full px-4 py-2 border border-border rounded-lg bg-white"
                 value={formData.type}
-                onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+                onChange={(e) =>
+                  setFormData({ ...formData, type: e.target.value })
+                }
               >
                 {mealTypes.map((type) => (
                   <option key={type.value} value={type.value}>
@@ -461,7 +570,9 @@ const Nutrition = () => {
               label="Date"
               type="date"
               value={formData.date}
-              onChange={(e) => setFormData({ ...formData, date: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, date: e.target.value })
+              }
               required
             />
           </div>
@@ -469,13 +580,20 @@ const Nutrition = () => {
           {/* Foods */}
           <div>
             <div className="flex items-center justify-between mb-3">
-              <label className="block text-sm font-medium text-primary">Food Items</label>
+              <label className="block text-sm font-medium text-primary">
+                Food Items
+              </label>
               <div className="flex gap-2">
-                <IndianFoodSelector 
-                  onSelectFood={handleSelectIndianFood} 
+                <IndianFoodSelector
+                  onSelectFood={handleSelectIndianFood}
                   currentMealType={formData.type}
                 />
-                <Button type="button" variant="outline" size="sm" onClick={handleAddFood}>
+                <Button
+                  type="button"
+                  variant="outline"
+                  size="sm"
+                  onClick={handleAddFood}
+                >
                   <Plus size={16} className="mr-1" />
                   Add Custom
                 </Button>
@@ -484,11 +602,21 @@ const Nutrition = () => {
 
             <div className="space-y-4">
               {formData.foods.map((food, index) => (
-                <div key={index} className="p-4 bg-gray-50 rounded-lg space-y-3">
+                <div
+                  key={index}
+                  className="p-4 bg-gray-50 rounded-lg space-y-3"
+                >
                   <div className="flex items-center justify-between">
-                    <span className="text-sm font-medium text-muted">Food {index + 1}</span>
+                    <span className="text-sm font-medium text-muted">
+                      Food {index + 1}
+                    </span>
                     {formData.foods.length > 1 && (
-                      <Button type="button" variant="ghost" size="sm" onClick={() => handleRemoveFood(index)}>
+                      <Button
+                        type="button"
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => handleRemoveFood(index)}
+                      >
                         Remove
                       </Button>
                     )}
@@ -497,7 +625,9 @@ const Nutrition = () => {
                     <Input
                       placeholder="Food name"
                       value={food.name}
-                      onChange={(e) => handleFoodChange(index, "name", e.target.value)}
+                      onChange={(e) =>
+                        handleFoodChange(index, "name", e.target.value)
+                      }
                       className="col-span-2 sm:col-span-1"
                       required
                     />
@@ -505,32 +635,42 @@ const Nutrition = () => {
                       type="number"
                       placeholder="Calories"
                       value={food.calories}
-                      onChange={(e) => handleFoodChange(index, "calories", e.target.value)}
+                      onChange={(e) =>
+                        handleFoodChange(index, "calories", e.target.value)
+                      }
                       required
                     />
                     <Input
                       type="number"
                       placeholder="Qty"
                       value={food.quantity}
-                      onChange={(e) => handleFoodChange(index, "quantity", e.target.value)}
+                      onChange={(e) =>
+                        handleFoodChange(index, "quantity", e.target.value)
+                      }
                     />
                     <Input
                       type="number"
                       placeholder="Protein (g)"
                       value={food.protein}
-                      onChange={(e) => handleFoodChange(index, "protein", e.target.value)}
+                      onChange={(e) =>
+                        handleFoodChange(index, "protein", e.target.value)
+                      }
                     />
                     <Input
                       type="number"
                       placeholder="Carbs (g)"
                       value={food.carbs}
-                      onChange={(e) => handleFoodChange(index, "carbs", e.target.value)}
+                      onChange={(e) =>
+                        handleFoodChange(index, "carbs", e.target.value)
+                      }
                     />
                     <Input
                       type="number"
                       placeholder="Fat (g)"
                       value={food.fat}
-                      onChange={(e) => handleFoodChange(index, "fat", e.target.value)}
+                      onChange={(e) =>
+                        handleFoodChange(index, "fat", e.target.value)
+                      }
                     />
                   </div>
                 </div>
@@ -541,12 +681,18 @@ const Nutrition = () => {
           <Input
             label="Notes (optional)"
             value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, notes: e.target.value })
+            }
             placeholder="Any additional notes..."
           />
 
           <div className="flex gap-3 justify-end">
-            <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowModal(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" loading={submitting}>
@@ -556,7 +702,7 @@ const Nutrition = () => {
         </form>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default Nutrition
+export default Nutrition;

@@ -1,59 +1,64 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { ClipboardList, Calendar, Target, Utensils, User, ChevronRight, Dumbbell } from "lucide-react"
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Badge from "../components/ui/Badge"
-import EmptyState from "../components/ui/EmptyState"
-import { plansService } from "../services/plans"
-import { formatDate } from "../utils/helpers"
-import { useAuth } from "../context/AuthContext"
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  ClipboardList,
+  Calendar,
+  Target,
+  Utensils,
+  User,
+  Dumbbell,
+} from "lucide-react";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
+import EmptyState from "../components/ui/EmptyState";
+import { plansService } from "../services/plans";
+import { formatDate } from "../utils/helpers";
+import { useAuth } from "../context/AuthContext";
 
 const MyPlan = () => {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(true)
-  const [plans, setPlans] = useState([])
-  const [selectedPlan, setSelectedPlan] = useState(null)
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [plans, setPlans] = useState([]);
+  const [selectedPlan, setSelectedPlan] = useState(null);
 
   useEffect(() => {
-    fetchPlans()
-  }, [])
+    fetchPlans();
+  }, []);
 
   const fetchPlans = async () => {
     try {
-      const data = await plansService.getMyPlans()
-      setPlans(data || [])
+      const data = await plansService.getMyPlans();
+      setPlans(data || []);
       // Auto-select the most recent active plan
-      const activePlan = data?.find((p) => p.status === "active")
+      const activePlan = data?.find((p) => p.status === "active");
       if (activePlan) {
-        setSelectedPlan(activePlan)
+        setSelectedPlan(activePlan);
       } else if (data?.length > 0) {
-        setSelectedPlan(data[0])
+        setSelectedPlan(data[0]);
       }
     } catch (error) {
-      console.error("Failed to fetch plans:", error)
+      console.error("Failed to fetch plans:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const getStatusBadge = (status) => {
     const variants = {
       active: "success",
       completed: "default",
       paused: "warning",
-    }
-    return variants[status] || "default"
-  }
+    };
+    return variants[status] || "default";
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   if (plans.length === 0) {
@@ -61,7 +66,9 @@ const MyPlan = () => {
       <div className="space-y-6">
         <div>
           <h1 className="text-2xl font-bold text-primary">My Training Plan</h1>
-          <p className="text-muted">View your personalized training and nutrition plans</p>
+          <p className="text-muted">
+            View your personalized training and nutrition plans
+          </p>
         </div>
         <EmptyState
           icon={ClipboardList}
@@ -83,7 +90,7 @@ const MyPlan = () => {
           }
         />
       </div>
-    )
+    );
   }
 
   return (
@@ -91,7 +98,9 @@ const MyPlan = () => {
       {/* Header */}
       <div>
         <h1 className="text-2xl font-bold text-primary">My Training Plan</h1>
-        <p className="text-muted">View your personalized training and nutrition plans</p>
+        <p className="text-muted">
+          View your personalized training and nutrition plans
+        </p>
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
@@ -108,12 +117,19 @@ const MyPlan = () => {
                     key={plan._id}
                     onClick={() => setSelectedPlan(plan)}
                     className={`p-3 rounded-lg cursor-pointer transition-all ${
-                      selectedPlan?._id === plan._id ? "bg-primary/10 border-2 border-primary" : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
+                      selectedPlan?._id === plan._id
+                        ? "bg-primary/10 border-2 border-primary"
+                        : "bg-gray-50 hover:bg-gray-100 border-2 border-transparent"
                     }`}
                   >
                     <div className="flex items-center justify-between mb-2">
-                      <h4 className="font-semibold text-primary text-sm">{plan.name}</h4>
-                      <Badge variant={getStatusBadge(plan.status)} className="text-xs">
+                      <h4 className="font-semibold text-primary text-sm">
+                        {plan.name}
+                      </h4>
+                      <Badge
+                        variant={getStatusBadge(plan.status)}
+                        className="text-xs"
+                      >
                         {plan.status}
                       </Badge>
                     </div>
@@ -140,8 +156,12 @@ const MyPlan = () => {
                     {selectedPlan.trainer.name?.charAt(0).toUpperCase()}
                   </div>
                   <div>
-                    <p className="font-semibold text-primary">{selectedPlan.trainer.name}</p>
-                    <p className="text-sm text-muted">{selectedPlan.trainer.email}</p>
+                    <p className="font-semibold text-primary">
+                      {selectedPlan.trainer.name}
+                    </p>
+                    <p className="text-sm text-muted">
+                      {selectedPlan.trainer.email}
+                    </p>
                   </div>
                 </div>
               </Card.Content>
@@ -158,9 +178,14 @@ const MyPlan = () => {
                 <div className="flex items-center justify-between">
                   <div>
                     <Card.Title>{selectedPlan.name}</Card.Title>
-                    <Card.Description>Created by {selectedPlan.trainer?.name}</Card.Description>
+                    <Card.Description>
+                      Created by {selectedPlan.trainer?.name}
+                    </Card.Description>
                   </div>
-                  <Badge variant={getStatusBadge(selectedPlan.status)} className="text-sm px-3 py-1">
+                  <Badge
+                    variant={getStatusBadge(selectedPlan.status)}
+                    className="text-sm px-3 py-1"
+                  >
                     {selectedPlan.status}
                   </Badge>
                 </div>
@@ -173,7 +198,9 @@ const MyPlan = () => {
                     </div>
                     <div>
                       <p className="text-xs text-muted">Start Date</p>
-                      <p className="text-sm font-semibold text-primary">{formatDate(selectedPlan.startDate)}</p>
+                      <p className="text-sm font-semibold text-primary">
+                        {formatDate(selectedPlan.startDate)}
+                      </p>
                     </div>
                   </div>
                   {selectedPlan.endDate && (
@@ -183,7 +210,9 @@ const MyPlan = () => {
                       </div>
                       <div>
                         <p className="text-xs text-muted">End Date</p>
-                        <p className="text-sm font-semibold text-primary">{formatDate(selectedPlan.endDate)}</p>
+                        <p className="text-sm font-semibold text-primary">
+                          {formatDate(selectedPlan.endDate)}
+                        </p>
                       </div>
                     </div>
                   )}
@@ -194,7 +223,9 @@ const MyPlan = () => {
                       </div>
                       <div>
                         <p className="text-xs text-muted">Daily Calories</p>
-                        <p className="text-sm font-semibold text-primary">{selectedPlan.dailyCalorieTarget} kcal</p>
+                        <p className="text-sm font-semibold text-primary">
+                          {selectedPlan.dailyCalorieTarget} kcal
+                        </p>
                       </div>
                     </div>
                   )}
@@ -205,7 +236,9 @@ const MyPlan = () => {
                       </div>
                       <div>
                         <p className="text-xs text-muted">Daily Protein</p>
-                        <p className="text-sm font-semibold text-primary">{selectedPlan.dailyProteinTarget}g</p>
+                        <p className="text-sm font-semibold text-primary">
+                          {selectedPlan.dailyProteinTarget}g
+                        </p>
                       </div>
                     </div>
                   )}
@@ -220,7 +253,9 @@ const MyPlan = () => {
                   <Card.Title>Plan Description</Card.Title>
                 </Card.Header>
                 <Card.Content>
-                  <p className="text-muted whitespace-pre-wrap">{selectedPlan.description}</p>
+                  <p className="text-muted whitespace-pre-wrap">
+                    {selectedPlan.description}
+                  </p>
                 </Card.Content>
               </Card>
             )}
@@ -232,7 +267,9 @@ const MyPlan = () => {
                   <Card.Title>Trainer's Notes</Card.Title>
                 </Card.Header>
                 <Card.Content>
-                  <p className="text-muted whitespace-pre-wrap">{selectedPlan.notes}</p>
+                  <p className="text-muted whitespace-pre-wrap">
+                    {selectedPlan.notes}
+                  </p>
                 </Card.Content>
               </Card>
             )}
@@ -246,10 +283,15 @@ const MyPlan = () => {
                 <Card.Content>
                   <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                     {selectedPlan.workoutPlan.map((day, index) => (
-                      <div key={index} className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                      <div
+                        key={index}
+                        className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200"
+                      >
                         <div className="flex items-center gap-2 mb-3">
                           <Dumbbell size={18} className="text-primary" />
-                          <h4 className="font-semibold text-primary capitalize">{day.day}</h4>
+                          <h4 className="font-semibold text-primary capitalize">
+                            {day.day}
+                          </h4>
                         </div>
                         {day.isRestDay ? (
                           <p className="text-sm text-muted italic">Rest Day</p>
@@ -257,14 +299,28 @@ const MyPlan = () => {
                           <div className="space-y-2">
                             {day.exercises?.map((exercise, idx) => (
                               <div key={idx} className="text-sm">
-                                <p className="font-medium text-primary">{exercise.name}</p>
+                                <p className="font-medium text-primary">
+                                  {exercise.name}
+                                </p>
                                 <div className="text-xs text-muted flex flex-wrap gap-2 mt-1">
-                                  {exercise.sets && <span>{exercise.sets} sets</span>}
-                                  {exercise.reps && <span>× {exercise.reps} reps</span>}
-                                  {exercise.weight && <span>@ {exercise.weight}kg</span>}
-                                  {exercise.duration && <span>{exercise.duration} min</span>}
+                                  {exercise.sets && (
+                                    <span>{exercise.sets} sets</span>
+                                  )}
+                                  {exercise.reps && (
+                                    <span>× {exercise.reps} reps</span>
+                                  )}
+                                  {exercise.weight && (
+                                    <span>@ {exercise.weight}kg</span>
+                                  )}
+                                  {exercise.duration && (
+                                    <span>{exercise.duration} min</span>
+                                  )}
                                 </div>
-                                {exercise.notes && <p className="text-xs text-muted mt-1 italic">{exercise.notes}</p>}
+                                {exercise.notes && (
+                                  <p className="text-xs text-muted mt-1 italic">
+                                    {exercise.notes}
+                                  </p>
+                                )}
                               </div>
                             ))}
                           </div>
@@ -285,28 +341,48 @@ const MyPlan = () => {
                 <Card.Content>
                   <div className="space-y-4">
                     {selectedPlan.mealPlan.map((day, index) => (
-                      <div key={index} className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200">
+                      <div
+                        key={index}
+                        className="p-4 bg-gray-50 rounded-lg border-2 border-gray-200"
+                      >
                         <div className="flex items-center gap-2 mb-3">
                           <Utensils size={18} className="text-primary" />
-                          <h4 className="font-semibold text-primary capitalize">{day.day}</h4>
+                          <h4 className="font-semibold text-primary capitalize">
+                            {day.day}
+                          </h4>
                         </div>
                         <div className="space-y-3">
                           {day.meals?.map((meal, idx) => (
-                            <div key={idx} className="pl-3 border-l-2 border-primary/30">
+                            <div
+                              key={idx}
+                              className="pl-3 border-l-2 border-primary/30"
+                            >
                               <div className="flex items-center justify-between mb-1">
-                                <p className="font-medium text-primary capitalize text-sm">{meal.type}</p>
+                                <p className="font-medium text-primary capitalize text-sm">
+                                  {meal.type}
+                                </p>
                                 {meal.targetCalories && (
-                                  <span className="text-xs text-muted">{meal.targetCalories} kcal</span>
+                                  <span className="text-xs text-muted">
+                                    {meal.targetCalories} kcal
+                                  </span>
                                 )}
                               </div>
-                              {meal.description && <p className="text-sm text-muted mb-1">{meal.description}</p>}
+                              {meal.description && (
+                                <p className="text-sm text-muted mb-1">
+                                  {meal.description}
+                                </p>
+                              )}
                               {meal.suggestions?.length > 0 && (
                                 <div className="mt-1">
-                                  <p className="text-xs text-muted/80 mb-1">Suggestions:</p>
+                                  <p className="text-xs text-muted/80 mb-1">
+                                    Suggestions:
+                                  </p>
                                   <ul className="text-xs text-muted list-disc list-inside space-y-0.5">
-                                    {meal.suggestions.map((suggestion, sIdx) => (
-                                      <li key={sIdx}>{suggestion}</li>
-                                    ))}
+                                    {meal.suggestions.map(
+                                      (suggestion, sIdx) => (
+                                        <li key={sIdx}>{suggestion}</li>
+                                      )
+                                    )}
                                   </ul>
                                 </div>
                               )}
@@ -321,22 +397,28 @@ const MyPlan = () => {
             )}
 
             {/* No workout or meal plan */}
-            {!selectedPlan.workoutPlan?.length && !selectedPlan.mealPlan?.length && (
-              <Card>
-                <Card.Content>
-                  <div className="text-center py-8 text-muted">
-                    <ClipboardList size={40} className="mx-auto mb-2 opacity-50" />
-                    <p>No detailed workout or meal plans added yet</p>
-                    <p className="text-sm mt-1">Contact your trainer for detailed plans</p>
-                  </div>
-                </Card.Content>
-              </Card>
-            )}
+            {!selectedPlan.workoutPlan?.length &&
+              !selectedPlan.mealPlan?.length && (
+                <Card>
+                  <Card.Content>
+                    <div className="text-center py-8 text-muted">
+                      <ClipboardList
+                        size={40}
+                        className="mx-auto mb-2 opacity-50"
+                      />
+                      <p>No detailed workout or meal plans added yet</p>
+                      <p className="text-sm mt-1">
+                        Contact your trainer for detailed plans
+                      </p>
+                    </div>
+                  </Card.Content>
+                </Card>
+              )}
           </div>
         )}
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default MyPlan
+export default MyPlan;

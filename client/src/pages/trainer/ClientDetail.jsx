@@ -1,42 +1,57 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { useParams, Link } from "react-router-dom"
-import { ArrowLeft, Mail, Activity, Dumbbell, Scale, Target, TrendingUp, TrendingDown } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import Card from "../../components/ui/Card"
-import Button from "../../components/ui/Button"
-import Badge from "../../components/ui/Badge"
-import ProgressBar from "../../components/ui/ProgressBar"
-import { trainerService } from "../../services/trainer"
-import { formatDate, calculatePercentage } from "../../utils/helpers"
+import { useState, useEffect } from "react";
+import { useParams, Link } from "react-router-dom";
+import {
+  ArrowLeft,
+  Mail,
+  Activity,
+  Dumbbell,
+  Scale,
+  Target,
+  TrendingUp,
+  TrendingDown,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Badge from "../../components/ui/Badge";
+import ProgressBar from "../../components/ui/ProgressBar";
+import { trainerService } from "../../services/trainer";
+import { formatDate, calculatePercentage } from "../../utils/helpers";
 
 const ClientDetail = () => {
-  const { id } = useParams()
-  const [loading, setLoading] = useState(true)
-  const [data, setData] = useState(null)
+  const { id } = useParams();
+  const [loading, setLoading] = useState(true);
+  const [data, setData] = useState(null);
 
   useEffect(() => {
-    fetchClientData()
-  }, [id])
+    fetchClientData();
+  }, [id]);
 
   const fetchClientData = async () => {
     try {
-      const response = await trainerService.getClientDetail(id)
-      setData(response)
+      const response = await trainerService.getClientDetail(id);
+      setData(response);
     } catch (error) {
-      console.error("Failed to fetch client data:", error)
+      console.error("Failed to fetch client data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   if (!data?.client) {
@@ -49,10 +64,10 @@ const ClientDetail = () => {
           </Button>
         </Link>
       </div>
-    )
+    );
   }
 
-  const { client, recentWorkouts, recentMeals, weightHistory, goals } = data
+  const { client, recentWorkouts, recentMeals, weightHistory, goals } = data;
 
   // Prepare weight chart data
   const weightChartData =
@@ -62,13 +77,19 @@ const ClientDetail = () => {
       .map((log) => ({
         date: formatDate(log.date, { month: "short", day: "numeric" }),
         weight: log.weight,
-      })) || []
+      })) || [];
 
   // Calculate recent stats
-  const totalWorkoutMinutes = recentWorkouts?.reduce((sum, w) => sum + (w.totalDuration || 0), 0) || 0
-  const totalCaloriesBurned = recentWorkouts?.reduce((sum, w) => sum + (w.totalCaloriesBurned || 0), 0) || 0
-  const latestWeight = weightHistory?.[0]?.weight
-  const weightChange = weightHistory?.length >= 2 ? weightHistory[0].weight - weightHistory[1].weight : 0
+  const totalWorkoutMinutes =
+    recentWorkouts?.reduce((sum, w) => sum + (w.totalDuration || 0), 0) || 0;
+  const totalCaloriesBurned =
+    recentWorkouts?.reduce((sum, w) => sum + (w.totalCaloriesBurned || 0), 0) ||
+    0;
+  const latestWeight = weightHistory?.[0]?.weight;
+  const weightChange =
+    weightHistory?.length >= 2
+      ? weightHistory[0].weight - weightHistory[1].weight
+      : 0;
 
   return (
     <div className="space-y-6">
@@ -101,7 +122,9 @@ const ClientDetail = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Recent Workouts</p>
-            <p className="text-xl font-bold text-primary">{recentWorkouts?.length || 0}</p>
+            <p className="text-xl font-bold text-primary">
+              {recentWorkouts?.length || 0}
+            </p>
           </div>
         </Card>
 
@@ -111,7 +134,9 @@ const ClientDetail = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Total Minutes</p>
-            <p className="text-xl font-bold text-primary">{totalWorkoutMinutes}</p>
+            <p className="text-xl font-bold text-primary">
+              {totalWorkoutMinutes}
+            </p>
           </div>
         </Card>
 
@@ -121,26 +146,37 @@ const ClientDetail = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Current Weight</p>
-            <p className="text-xl font-bold text-primary">{latestWeight ? `${latestWeight} kg` : "N/A"}</p>
+            <p className="text-xl font-bold text-primary">
+              {latestWeight ? `${latestWeight} kg` : "N/A"}
+            </p>
           </div>
         </Card>
 
         <Card className="flex items-center gap-3">
           <div
             className={`w-10 h-10 rounded-lg flex items-center justify-center ${
-              weightChange < 0 ? "bg-green-100" : weightChange > 0 ? "bg-red-100" : "bg-gray-100"
+              weightChange < 0
+                ? "bg-green-100"
+                : weightChange > 0
+                ? "bg-red-100"
+                : "bg-gray-100"
             }`}
           >
             {weightChange < 0 ? (
               <TrendingDown className="text-green-600" size={20} />
             ) : (
-              <TrendingUp className={weightChange > 0 ? "text-red-600" : "text-gray-600"} size={20} />
+              <TrendingUp
+                className={weightChange > 0 ? "text-red-600" : "text-gray-600"}
+                size={20}
+              />
             )}
           </div>
           <div>
             <p className="text-sm text-muted">Weight Change</p>
             <p className="text-xl font-bold text-primary">
-              {weightChange !== 0 ? `${weightChange > 0 ? "+" : ""}${weightChange.toFixed(1)} kg` : "N/A"}
+              {weightChange !== 0
+                ? `${weightChange > 0 ? "+" : ""}${weightChange.toFixed(1)} kg`
+                : "N/A"}
             </p>
           </div>
         </Card>
@@ -157,22 +193,29 @@ const ClientDetail = () => {
             <div className="space-y-3">
               <div className="flex items-center justify-between py-2 border-b border-border">
                 <span className="text-muted">Age</span>
-                <span className="font-medium">{client.profile?.age || "Not set"}</span>
+                <span className="font-medium">
+                  {client.profile?.age || "Not set"}
+                </span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-border">
                 <span className="text-muted">Gender</span>
-                <span className="font-medium capitalize">{client.profile?.gender || "Not set"}</span>
+                <span className="font-medium capitalize">
+                  {client.profile?.gender || "Not set"}
+                </span>
               </div>
               <div className="flex items-center justify-between py-2 border-b border-border">
                 <span className="text-muted">Height</span>
                 <span className="font-medium">
-                  {client.profile?.height ? `${client.profile.height} cm` : "Not set"}
+                  {client.profile?.height
+                    ? `${client.profile.height} cm`
+                    : "Not set"}
                 </span>
               </div>
               <div className="flex items-center justify-between py-2">
                 <span className="text-muted">Activity Level</span>
                 <span className="font-medium capitalize">
-                  {client.profile?.activityLevel?.replace("_", " ") || "Not set"}
+                  {client.profile?.activityLevel?.replace("_", " ") ||
+                    "Not set"}
                 </span>
               </div>
             </div>
@@ -190,7 +233,11 @@ const ClientDetail = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={weightChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#737373" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 12 }}
+                      stroke="#737373"
+                    />
                     <YAxis
                       domain={["dataMin - 1", "dataMax + 1"]}
                       tick={{ fontSize: 12 }}
@@ -238,16 +285,33 @@ const ClientDetail = () => {
                     <div className="flex items-center justify-between mb-2">
                       <div className="flex items-center gap-2">
                         <Target size={16} className="text-primary" />
-                        <span className="font-medium text-primary">{goal.title}</span>
+                        <span className="font-medium text-primary">
+                          {goal.title}
+                        </span>
                       </div>
-                      <Badge variant={goal.status === "completed" ? "success" : "warning"}>{goal.status}</Badge>
+                      <Badge
+                        variant={
+                          goal.status === "completed" ? "success" : "warning"
+                        }
+                      >
+                        {goal.status}
+                      </Badge>
                     </div>
-                    <ProgressBar value={goal.currentValue} max={goal.targetValue} />
+                    <ProgressBar
+                      value={goal.currentValue}
+                      max={goal.targetValue}
+                    />
                     <div className="flex justify-between text-sm text-muted mt-1">
                       <span>
                         {goal.currentValue} / {goal.targetValue} {goal.unit}
                       </span>
-                      <span>{calculatePercentage(goal.currentValue, goal.targetValue)}%</span>
+                      <span>
+                        {calculatePercentage(
+                          goal.currentValue,
+                          goal.targetValue
+                        )}
+                        %
+                      </span>
                     </div>
                   </div>
                 ))}
@@ -270,19 +334,30 @@ const ClientDetail = () => {
             {recentWorkouts?.length > 0 ? (
               <div className="space-y-3">
                 {recentWorkouts.map((workout) => (
-                  <div key={workout._id} className="flex items-center justify-between p-3 bg-gray-50 rounded-lg">
+                  <div
+                    key={workout._id}
+                    className="flex items-center justify-between p-3 bg-gray-50 rounded-lg"
+                  >
                     <div className="flex items-center gap-3">
                       <div className="w-10 h-10 bg-primary rounded-lg flex items-center justify-center">
                         <Dumbbell className="text-white" size={20} />
                       </div>
                       <div>
-                        <p className="font-medium text-primary">{workout.name}</p>
-                        <p className="text-sm text-muted">{formatDate(workout.date)}</p>
+                        <p className="font-medium text-primary">
+                          {workout.name}
+                        </p>
+                        <p className="text-sm text-muted">
+                          {formatDate(workout.date)}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-primary">{workout.totalDuration} min</p>
-                      <p className="text-sm text-muted">{workout.totalCaloriesBurned} kcal</p>
+                      <p className="font-medium text-primary">
+                        {workout.totalDuration} min
+                      </p>
+                      <p className="text-sm text-muted">
+                        {workout.totalCaloriesBurned} kcal
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -297,7 +372,7 @@ const ClientDetail = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default ClientDetail
+export default ClientDetail;

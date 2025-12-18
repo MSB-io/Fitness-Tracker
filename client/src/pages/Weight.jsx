@@ -1,25 +1,39 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Plus, Scale, TrendingUp, TrendingDown, Trash2, Target } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, ReferenceLine } from "recharts"
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Input from "../components/ui/Input"
-import Modal from "../components/ui/Modal"
-import EmptyState from "../components/ui/EmptyState"
-import { weightService } from "../services/weight"
-import { formatDate, calculateBMI, getBMICategory } from "../utils/helpers"
-import { useAuth } from "../context/AuthContext"
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  Scale,
+  TrendingUp,
+  TrendingDown,
+  Trash2,
+  Target,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+  ReferenceLine,
+} from "recharts";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Modal from "../components/ui/Modal";
+import EmptyState from "../components/ui/EmptyState";
+import { weightService } from "../services/weight";
+import { formatDate, calculateBMI, getBMICategory } from "../utils/helpers";
+import { useAuth } from "../context/AuthContext";
 
 const Weight = () => {
-  const { user } = useAuth()
-  const [logs, setLogs] = useState([])
-  const [progress, setProgress] = useState(null)
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [submitting, setSubmitting] = useState(false)
-  const [deleting, setDeleting] = useState(null)
+  const { user } = useAuth();
+  const [logs, setLogs] = useState([]);
+  const [progress, setProgress] = useState(null);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   const [formData, setFormData] = useState({
     weight: "",
@@ -27,65 +41,72 @@ const Weight = () => {
     muscleMass: "",
     notes: "",
     date: new Date().toISOString().split("T")[0],
-  })
+  });
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
-      const [logsData, progressData] = await Promise.all([weightService.getAll(60), weightService.getProgress()])
+      const [logsData, progressData] = await Promise.all([
+        weightService.getAll(60),
+        weightService.getProgress(),
+      ]);
 
-      setLogs(logsData || [])
-      setProgress(progressData)
+      setLogs(logsData || []);
+      setProgress(progressData);
     } catch (error) {
-      console.error("Failed to fetch weight data:", error)
+      console.error("Failed to fetch weight data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
 
     try {
       await weightService.create({
         weight: Number.parseFloat(formData.weight),
-        bodyFat: formData.bodyFat ? Number.parseFloat(formData.bodyFat) : undefined,
-        muscleMass: formData.muscleMass ? Number.parseFloat(formData.muscleMass) : undefined,
+        bodyFat: formData.bodyFat
+          ? Number.parseFloat(formData.bodyFat)
+          : undefined,
+        muscleMass: formData.muscleMass
+          ? Number.parseFloat(formData.muscleMass)
+          : undefined,
         notes: formData.notes,
         date: formData.date,
-      })
+      });
 
-      setShowModal(false)
+      setShowModal(false);
       setFormData({
         weight: "",
         bodyFat: "",
         muscleMass: "",
         notes: "",
         date: new Date().toISOString().split("T")[0],
-      })
-      fetchData()
+      });
+      fetchData();
     } catch (error) {
-      console.error("Failed to create weight log:", error)
+      console.error("Failed to create weight log:", error);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
-    setDeleting(id)
+    setDeleting(id);
     try {
-      await weightService.delete(id)
-      fetchData()
+      await weightService.delete(id);
+      fetchData();
     } catch (error) {
-      console.error("Failed to delete weight log:", error)
+      console.error("Failed to delete weight log:", error);
     } finally {
-      setDeleting(null)
+      setDeleting(null);
     }
-  }
+  };
 
   // Prepare chart data (already sorted oldest to newest from server)
   const chartData =
@@ -93,22 +114,25 @@ const Weight = () => {
       date: formatDate(log.date, { month: "short", day: "numeric" }),
       weight: log.weight,
       bodyFat: log.bodyFat,
-    })) || []
+    })) || [];
 
   // Calculate current BMI
-  const currentWeight = progress?.currentWeight
-  const height = user?.profile?.height
-  const bmi = currentWeight && height ? calculateBMI(currentWeight, height) : null
+  const currentWeight = progress?.currentWeight;
+  const height = user?.profile?.height;
+  const bmi =
+    currentWeight && height ? calculateBMI(currentWeight, height) : null;
 
   // Calculate target weight for normal BMI (if overweight)
-  const targetWeight = height ? Math.round(24.9 * Math.pow(height / 100, 2)) : null
+  const targetWeight = height
+    ? Math.round(24.9 * Math.pow(height / 100, 2))
+    : null;
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -142,20 +166,31 @@ const Weight = () => {
         <Card className="flex items-center gap-4">
           <div
             className={`w-12 h-12 rounded-lg flex items-center justify-center ${
-              progress?.change < 0 ? "bg-green-100" : progress?.change > 0 ? "bg-red-100" : "bg-gray-100"
+              progress?.change < 0
+                ? "bg-green-100"
+                : progress?.change > 0
+                ? "bg-red-100"
+                : "bg-gray-100"
             }`}
           >
             {progress?.change < 0 ? (
               <TrendingDown className="text-green-600" size={24} />
             ) : (
-              <TrendingUp className={progress?.change > 0 ? "text-red-600" : "text-gray-600"} size={24} />
+              <TrendingUp
+                className={
+                  progress?.change > 0 ? "text-red-600" : "text-gray-600"
+                }
+                size={24}
+              />
             )}
           </div>
           <div>
             <p className="text-sm text-muted">Total Change</p>
             <p className="text-2xl font-bold text-primary">
               {progress?.change !== undefined
-                ? `${progress.change > 0 ? "+" : ""}${progress.change.toFixed(1)} kg`
+                ? `${progress.change > 0 ? "+" : ""}${progress.change.toFixed(
+                    1
+                  )} kg`
                 : "N/A"}
             </p>
           </div>
@@ -169,7 +204,9 @@ const Weight = () => {
             <p className="text-sm text-muted">BMI</p>
             <div>
               <p className="text-2xl font-bold text-primary">{bmi || "N/A"}</p>
-              {bmi && <p className="text-xs text-muted">{getBMICategory(bmi)}</p>}
+              {bmi && (
+                <p className="text-xs text-muted">{getBMICategory(bmi)}</p>
+              )}
             </div>
           </div>
         </Card>
@@ -199,8 +236,17 @@ const Weight = () => {
               <ResponsiveContainer width="100%" height="100%">
                 <LineChart data={chartData}>
                   <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                  <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#737373" />
-                  <YAxis domain={["dataMin - 2", "dataMax + 2"]} tick={{ fontSize: 12 }} stroke="#737373" unit=" kg" />
+                  <XAxis
+                    dataKey="date"
+                    tick={{ fontSize: 12 }}
+                    stroke="#737373"
+                  />
+                  <YAxis
+                    domain={["dataMin - 2", "dataMax + 2"]}
+                    tick={{ fontSize: 12 }}
+                    stroke="#737373"
+                    unit=" kg"
+                  />
                   <Tooltip
                     contentStyle={{
                       backgroundColor: "#fff",
@@ -213,7 +259,11 @@ const Weight = () => {
                       y={targetWeight}
                       stroke="#22c55e"
                       strokeDasharray="5 5"
-                      label={{ value: `Target: ${targetWeight}kg`, fill: "#22c55e", fontSize: 12 }}
+                      label={{
+                        value: `Target: ${targetWeight}kg`,
+                        fill: "#22c55e",
+                        fontSize: 12,
+                      }}
                     />
                   )}
                   <Line
@@ -247,8 +297,8 @@ const Weight = () => {
           {logs.length > 0 ? (
             <div className="space-y-2">
               {logs.map((log, index) => {
-                const prevLog = logs[index + 1]
-                const change = prevLog ? log.weight - prevLog.weight : 0
+                const prevLog = logs[index + 1];
+                const change = prevLog ? log.weight - prevLog.weight : 0;
 
                 return (
                   <div
@@ -260,8 +310,12 @@ const Weight = () => {
                         <Scale className="text-white" size={20} />
                       </div>
                       <div>
-                        <p className="font-semibold text-primary">{log.weight} kg</p>
-                        <p className="text-sm text-muted">{formatDate(log.date)}</p>
+                        <p className="font-semibold text-primary">
+                          {log.weight} kg
+                        </p>
+                        <p className="text-sm text-muted">
+                          {formatDate(log.date)}
+                        </p>
                       </div>
                     </div>
                     <div className="flex items-center gap-4">
@@ -271,11 +325,19 @@ const Weight = () => {
                             change < 0 ? "text-green-600" : "text-red-600"
                           }`}
                         >
-                          {change < 0 ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                          {change < 0 ? (
+                            <TrendingDown size={16} />
+                          ) : (
+                            <TrendingUp size={16} />
+                          )}
                           {Math.abs(change).toFixed(1)} kg
                         </span>
                       )}
-                      {log.bodyFat && <span className="text-sm text-muted hidden sm:inline">{log.bodyFat}% BF</span>}
+                      {log.bodyFat && (
+                        <span className="text-sm text-muted hidden sm:inline">
+                          {log.bodyFat}% BF
+                        </span>
+                      )}
                       <Button
                         variant="ghost"
                         size="sm"
@@ -286,7 +348,7 @@ const Weight = () => {
                       </Button>
                     </div>
                   </div>
-                )
+                );
               })}
             </div>
           ) : (
@@ -306,14 +368,21 @@ const Weight = () => {
       </Card>
 
       {/* Add Weight Modal */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Log Weight" size="md">
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Log Weight"
+        size="md"
+      >
         <form onSubmit={handleSubmit} className="space-y-4">
           <Input
             label="Weight (kg)"
             type="number"
             step="0.1"
             value={formData.weight}
-            onChange={(e) => setFormData({ ...formData, weight: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, weight: e.target.value })
+            }
             placeholder="e.g., 75.5"
             required
           />
@@ -331,7 +400,9 @@ const Weight = () => {
             type="number"
             step="0.1"
             value={formData.bodyFat}
-            onChange={(e) => setFormData({ ...formData, bodyFat: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, bodyFat: e.target.value })
+            }
             placeholder="e.g., 20.5"
           />
 
@@ -340,19 +411,27 @@ const Weight = () => {
             type="number"
             step="0.1"
             value={formData.muscleMass}
-            onChange={(e) => setFormData({ ...formData, muscleMass: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, muscleMass: e.target.value })
+            }
             placeholder="e.g., 35.0"
           />
 
           <Input
             label="Notes (optional)"
             value={formData.notes}
-            onChange={(e) => setFormData({ ...formData, notes: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, notes: e.target.value })
+            }
             placeholder="Any additional notes..."
           />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowModal(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" loading={submitting}>
@@ -362,7 +441,7 @@ const Weight = () => {
         </form>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default Weight
+export default Weight;

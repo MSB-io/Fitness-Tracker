@@ -1,16 +1,22 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Plus, Target, Calendar, Trophy, Trash2, Edit2, Clock } from "lucide-react"
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Input from "../components/ui/Input"
-import Modal from "../components/ui/Modal"
-import Badge from "../components/ui/Badge"
-import EmptyState from "../components/ui/EmptyState"
-import ProgressBar from "../components/ui/ProgressBar"
-import { goalService } from "../services/goals"
-import { formatDate, calculatePercentage } from "../utils/helpers"
+import { useState, useEffect } from "react";
+import {
+  Plus,
+  Target,
+  Calendar,
+  Trophy,
+  Trash2,
+  Edit2,
+  Clock,
+} from "lucide-react";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Input from "../components/ui/Input";
+import Modal from "../components/ui/Modal";
+import Badge from "../components/ui/Badge";
+import EmptyState from "../components/ui/EmptyState";
+import ProgressBar from "../components/ui/ProgressBar";
+import { goalService } from "../services/goals";
+import { formatDate, calculatePercentage } from "../utils/helpers";
 
 const goalTypes = [
   { value: "weight_loss", label: "Weight Loss" },
@@ -20,17 +26,17 @@ const goalTypes = [
   { value: "strength", label: "Strength" },
   { value: "flexibility", label: "Flexibility" },
   { value: "custom", label: "Custom" },
-]
+];
 
 const Goals = () => {
-  const [goals, setGoals] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [showModal, setShowModal] = useState(false)
-  const [showProgressModal, setShowProgressModal] = useState(false)
-  const [selectedGoal, setSelectedGoal] = useState(null)
-  const [filter, setFilter] = useState("all")
-  const [submitting, setSubmitting] = useState(false)
-  const [deleting, setDeleting] = useState(null)
+  const [goals, setGoals] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [showModal, setShowModal] = useState(false);
+  const [showProgressModal, setShowProgressModal] = useState(false);
+  const [selectedGoal, setSelectedGoal] = useState(null);
+  const [filter, setFilter] = useState("all");
+  const [submitting, setSubmitting] = useState(false);
+  const [deleting, setDeleting] = useState(null);
 
   const [formData, setFormData] = useState({
     type: "weight_loss",
@@ -40,37 +46,37 @@ const Goals = () => {
     currentValue: "",
     unit: "kg",
     deadline: "",
-  })
+  });
 
-  const [progressValue, setProgressValue] = useState("")
+  const [progressValue, setProgressValue] = useState("");
 
   useEffect(() => {
-    fetchGoals()
-  }, [])
+    fetchGoals();
+  }, []);
 
   const fetchGoals = async () => {
     try {
-      const data = await goalService.getAll()
-      setGoals(data || [])
+      const data = await goalService.getAll();
+      setGoals(data || []);
     } catch (error) {
-      console.error("Failed to fetch goals:", error)
+      console.error("Failed to fetch goals:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const handleSubmit = async (e) => {
-    e.preventDefault()
-    setSubmitting(true)
+    e.preventDefault();
+    setSubmitting(true);
 
     try {
       await goalService.create({
         ...formData,
         targetValue: Number.parseFloat(formData.targetValue),
         currentValue: Number.parseFloat(formData.currentValue) || 0,
-      })
+      });
 
-      setShowModal(false)
+      setShowModal(false);
       setFormData({
         type: "weight_loss",
         title: "",
@@ -79,67 +85,70 @@ const Goals = () => {
         currentValue: "",
         unit: "kg",
         deadline: "",
-      })
-      fetchGoals()
+      });
+      fetchGoals();
     } catch (error) {
-      console.error("Failed to create goal:", error)
+      console.error("Failed to create goal:", error);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleUpdateProgress = async (e) => {
-    e.preventDefault()
-    if (!selectedGoal) return
+    e.preventDefault();
+    if (!selectedGoal) return;
 
-    setSubmitting(true)
+    setSubmitting(true);
     try {
-      await goalService.updateProgress(selectedGoal._id, Number.parseFloat(progressValue))
-      setShowProgressModal(false)
-      setSelectedGoal(null)
-      setProgressValue("")
-      fetchGoals()
+      await goalService.updateProgress(
+        selectedGoal._id,
+        Number.parseFloat(progressValue)
+      );
+      setShowProgressModal(false);
+      setSelectedGoal(null);
+      setProgressValue("");
+      fetchGoals();
     } catch (error) {
-      console.error("Failed to update progress:", error)
+      console.error("Failed to update progress:", error);
     } finally {
-      setSubmitting(false)
+      setSubmitting(false);
     }
-  }
+  };
 
   const handleDelete = async (id) => {
-    setDeleting(id)
+    setDeleting(id);
     try {
-      await goalService.delete(id)
-      fetchGoals()
+      await goalService.delete(id);
+      fetchGoals();
     } catch (error) {
-      console.error("Failed to delete goal:", error)
+      console.error("Failed to delete goal:", error);
     } finally {
-      setDeleting(null)
+      setDeleting(null);
     }
-  }
+  };
 
   const openProgressModal = (goal) => {
-    setSelectedGoal(goal)
-    setProgressValue(goal.currentValue.toString())
-    setShowProgressModal(true)
-  }
+    setSelectedGoal(goal);
+    setProgressValue(goal.currentValue.toString());
+    setShowProgressModal(true);
+  };
 
   const filteredGoals = goals.filter((goal) => {
-    if (filter === "all") return true
-    return goal.status === filter
-  })
+    if (filter === "all") return true;
+    return goal.status === filter;
+  });
 
-  const activeGoals = goals.filter((g) => g.status === "active")
-  const completedGoals = goals.filter((g) => g.status === "completed")
+  const activeGoals = goals.filter((g) => g.status === "active");
+  const completedGoals = goals.filter((g) => g.status === "completed");
 
   const getStatusBadge = (status) => {
     const variants = {
       active: "warning",
       completed: "success",
       abandoned: "danger",
-    }
-    return variants[status] || "default"
-  }
+    };
+    return variants[status] || "default";
+  };
 
   const getTypeColor = (type) => {
     const colors = {
@@ -150,23 +159,23 @@ const Goals = () => {
       strength: "bg-red-100 text-red-700",
       flexibility: "bg-cyan-100 text-cyan-700",
       custom: "bg-gray-100 text-gray-700",
-    }
-    return colors[type] || colors.custom
-  }
+    };
+    return colors[type] || colors.custom;
+  };
 
   const getDaysRemaining = (deadline) => {
-    const now = new Date()
-    const due = new Date(deadline)
-    const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24))
-    return diff
-  }
+    const now = new Date();
+    const due = new Date(deadline);
+    const diff = Math.ceil((due - now) / (1000 * 60 * 60 * 24));
+    return diff;
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -191,7 +200,9 @@ const Goals = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Active Goals</p>
-            <p className="text-2xl font-bold text-primary">{activeGoals.length}</p>
+            <p className="text-2xl font-bold text-primary">
+              {activeGoals.length}
+            </p>
           </div>
         </Card>
 
@@ -201,7 +212,9 @@ const Goals = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Completed</p>
-            <p className="text-2xl font-bold text-primary">{completedGoals.length}</p>
+            <p className="text-2xl font-bold text-primary">
+              {completedGoals.length}
+            </p>
           </div>
         </Card>
 
@@ -228,7 +241,9 @@ const Goals = () => {
             key={tab.value}
             onClick={() => setFilter(tab.value)}
             className={`px-4 py-2 text-sm font-medium rounded-lg transition-colors ${
-              filter === tab.value ? "bg-primary text-white" : "text-muted hover:bg-gray-100"
+              filter === tab.value
+                ? "bg-primary text-white"
+                : "text-muted hover:bg-gray-100"
             }`}
           >
             {tab.label}
@@ -240,27 +255,44 @@ const Goals = () => {
       {filteredGoals.length > 0 ? (
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
           {filteredGoals.map((goal) => {
-            const progress = calculatePercentage(goal.currentValue, goal.targetValue)
-            const daysRemaining = getDaysRemaining(goal.deadline)
+            const progress = calculatePercentage(
+              goal.currentValue,
+              goal.targetValue
+            );
+            const daysRemaining = getDaysRemaining(goal.deadline);
 
             return (
               <Card key={goal._id} className="relative">
                 <div className="flex items-start justify-between mb-4">
                   <div className="flex items-center gap-3">
-                    <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${getTypeColor(goal.type)}`}>
+                    <div
+                      className={`w-10 h-10 rounded-lg flex items-center justify-center ${getTypeColor(
+                        goal.type
+                      )}`}
+                    >
                       <Target size={20} />
                     </div>
                     <div>
-                      <h3 className="font-semibold text-primary">{goal.title}</h3>
-                      <span className={`text-xs px-2 py-0.5 rounded-full ${getTypeColor(goal.type)}`}>
+                      <h3 className="font-semibold text-primary">
+                        {goal.title}
+                      </h3>
+                      <span
+                        className={`text-xs px-2 py-0.5 rounded-full ${getTypeColor(
+                          goal.type
+                        )}`}
+                      >
                         {goal.type.replace("_", " ")}
                       </span>
                     </div>
                   </div>
-                  <Badge variant={getStatusBadge(goal.status)}>{goal.status}</Badge>
+                  <Badge variant={getStatusBadge(goal.status)}>
+                    {goal.status}
+                  </Badge>
                 </div>
 
-                {goal.description && <p className="text-sm text-muted mb-4">{goal.description}</p>}
+                {goal.description && (
+                  <p className="text-sm text-muted mb-4">{goal.description}</p>
+                )}
 
                 <div className="mb-4">
                   <div className="flex justify-between text-sm mb-1">
@@ -269,12 +301,23 @@ const Goals = () => {
                       {goal.currentValue} / {goal.targetValue} {goal.unit}
                     </span>
                   </div>
-                  <ProgressBar value={goal.currentValue} max={goal.targetValue} />
+                  <ProgressBar
+                    value={goal.currentValue}
+                    max={goal.targetValue}
+                  />
                   <div className="flex justify-between mt-1">
-                    <span className="text-sm text-muted">{progress}% complete</span>
+                    <span className="text-sm text-muted">
+                      {progress}% complete
+                    </span>
                     {goal.status === "active" && (
-                      <span className={`text-sm ${daysRemaining < 7 ? "text-red-600" : "text-muted"}`}>
-                        {daysRemaining > 0 ? `${daysRemaining} days left` : "Overdue"}
+                      <span
+                        className={`text-sm ${
+                          daysRemaining < 7 ? "text-red-600" : "text-muted"
+                        }`}
+                      >
+                        {daysRemaining > 0
+                          ? `${daysRemaining} days left`
+                          : "Overdue"}
                       </span>
                     )}
                   </div>
@@ -287,7 +330,11 @@ const Goals = () => {
                   </div>
                   <div className="flex gap-2">
                     {goal.status === "active" && (
-                      <Button variant="outline" size="sm" onClick={() => openProgressModal(goal)}>
+                      <Button
+                        variant="outline"
+                        size="sm"
+                        onClick={() => openProgressModal(goal)}
+                      >
                         <Edit2 size={16} className="mr-1" />
                         Update
                       </Button>
@@ -303,14 +350,18 @@ const Goals = () => {
                   </div>
                 </div>
               </Card>
-            )
+            );
           })}
         </div>
       ) : (
         <EmptyState
           icon={Target}
           title={filter === "all" ? "No goals yet" : `No ${filter} goals`}
-          description={filter === "all" ? "Set your first fitness goal to start tracking your progress" : undefined}
+          description={
+            filter === "all"
+              ? "Set your first fitness goal to start tracking your progress"
+              : undefined
+          }
           action={
             filter === "all" && (
               <Button onClick={() => setShowModal(true)}>
@@ -323,14 +374,23 @@ const Goals = () => {
       )}
 
       {/* Create Goal Modal */}
-      <Modal isOpen={showModal} onClose={() => setShowModal(false)} title="Create New Goal" size="md">
+      <Modal
+        isOpen={showModal}
+        onClose={() => setShowModal(false)}
+        title="Create New Goal"
+        size="md"
+      >
         <form onSubmit={handleSubmit} className="space-y-4">
           <div>
-            <label className="block text-sm font-medium text-primary mb-1">Goal Type</label>
+            <label className="block text-sm font-medium text-primary mb-1">
+              Goal Type
+            </label>
             <select
               className="w-full px-4 py-2 border border-border rounded-lg bg-white"
               value={formData.type}
-              onChange={(e) => setFormData({ ...formData, type: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, type: e.target.value })
+              }
             >
               {goalTypes.map((type) => (
                 <option key={type.value} value={type.value}>
@@ -343,7 +403,9 @@ const Goals = () => {
           <Input
             label="Goal Title"
             value={formData.title}
-            onChange={(e) => setFormData({ ...formData, title: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, title: e.target.value })
+            }
             placeholder="e.g., Lose 10kg by summer"
             required
           />
@@ -351,7 +413,9 @@ const Goals = () => {
           <Input
             label="Description (optional)"
             value={formData.description}
-            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, description: e.target.value })
+            }
             placeholder="Add more details about your goal"
           />
 
@@ -361,7 +425,9 @@ const Goals = () => {
               type="number"
               step="0.1"
               value={formData.targetValue}
-              onChange={(e) => setFormData({ ...formData, targetValue: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, targetValue: e.target.value })
+              }
               placeholder="e.g., 10"
               required
             />
@@ -370,13 +436,17 @@ const Goals = () => {
               type="number"
               step="0.1"
               value={formData.currentValue}
-              onChange={(e) => setFormData({ ...formData, currentValue: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, currentValue: e.target.value })
+              }
               placeholder="e.g., 0"
             />
             <Input
               label="Unit"
               value={formData.unit}
-              onChange={(e) => setFormData({ ...formData, unit: e.target.value })}
+              onChange={(e) =>
+                setFormData({ ...formData, unit: e.target.value })
+              }
               placeholder="kg, reps, min"
               required
             />
@@ -386,12 +456,18 @@ const Goals = () => {
             label="Deadline"
             type="date"
             value={formData.deadline}
-            onChange={(e) => setFormData({ ...formData, deadline: e.target.value })}
+            onChange={(e) =>
+              setFormData({ ...formData, deadline: e.target.value })
+            }
             required
           />
 
           <div className="flex gap-3 justify-end pt-4">
-            <Button type="button" variant="outline" onClick={() => setShowModal(false)}>
+            <Button
+              type="button"
+              variant="outline"
+              onClick={() => setShowModal(false)}
+            >
               Cancel
             </Button>
             <Button type="submit" loading={submitting}>
@@ -405,8 +481,8 @@ const Goals = () => {
       <Modal
         isOpen={showProgressModal}
         onClose={() => {
-          setShowProgressModal(false)
-          setSelectedGoal(null)
+          setShowProgressModal(false);
+          setSelectedGoal(null);
         }}
         title="Update Progress"
         size="sm"
@@ -415,7 +491,9 @@ const Goals = () => {
           {selectedGoal && (
             <>
               <div className="text-center pb-4 border-b border-border">
-                <h3 className="font-semibold text-primary">{selectedGoal.title}</h3>
+                <h3 className="font-semibold text-primary">
+                  {selectedGoal.title}
+                </h3>
                 <p className="text-sm text-muted">
                   Target: {selectedGoal.targetValue} {selectedGoal.unit}
                 </p>
@@ -435,8 +513,8 @@ const Goals = () => {
                   type="button"
                   variant="outline"
                   onClick={() => {
-                    setShowProgressModal(false)
-                    setSelectedGoal(null)
+                    setShowProgressModal(false);
+                    setSelectedGoal(null);
                   }}
                 >
                   Cancel
@@ -450,7 +528,7 @@ const Goals = () => {
         </form>
       </Modal>
     </div>
-  )
-}
+  );
+};
 
-export default Goals
+export default Goals;

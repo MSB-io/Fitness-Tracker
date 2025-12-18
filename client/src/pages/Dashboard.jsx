@@ -1,44 +1,64 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Dumbbell, Utensils, Scale, Target, TrendingUp, TrendingDown, Activity, Flame } from "lucide-react"
-import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer } from "recharts"
-import Card from "../components/ui/Card"
-import Button from "../components/ui/Button"
-import Badge from "../components/ui/Badge"
-import ProgressBar from "../components/ui/ProgressBar"
-import { useAuth } from "../context/AuthContext"
-import { workoutService } from "../services/workouts"
-import { mealService } from "../services/meals"
-import { weightService } from "../services/weight"
-import { goalService } from "../services/goals"
-import { formatDate, formatNumber, calculatePercentage } from "../utils/helpers"
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import {
+  Dumbbell,
+  Utensils,
+  Scale,
+  Target,
+  TrendingUp,
+  TrendingDown,
+  Activity,
+  Flame,
+} from "lucide-react";
+import {
+  LineChart,
+  Line,
+  XAxis,
+  YAxis,
+  CartesianGrid,
+  Tooltip,
+  ResponsiveContainer,
+} from "recharts";
+import Card from "../components/ui/Card";
+import Button from "../components/ui/Button";
+import Badge from "../components/ui/Badge";
+import ProgressBar from "../components/ui/ProgressBar";
+import { useAuth } from "../context/AuthContext";
+import { workoutService } from "../services/workouts";
+import { mealService } from "../services/meals";
+import { weightService } from "../services/weight";
+import { goalService } from "../services/goals";
+import {
+  formatDate,
+  formatNumber,
+  calculatePercentage,
+} from "../utils/helpers";
 
 const Dashboard = () => {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(true)
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
   const [data, setData] = useState({
     workoutStats: null,
     todayMeals: null,
     weightProgress: null,
     activeGoals: [],
     recentWorkouts: [],
-  })
+  });
 
   useEffect(() => {
-    fetchDashboardData()
-  }, [])
+    fetchDashboardData();
+  }, []);
 
   const fetchDashboardData = async () => {
     try {
-      const [workoutStats, todayMeals, weightProgress, goals, workouts] = await Promise.all([
-        workoutService.getStats(7),
-        mealService.getToday(),
-        weightService.getProgress(),
-        goalService.getAll("active"),
-        workoutService.getAll({ limit: 5 }),
-      ])
+      const [workoutStats, todayMeals, weightProgress, goals, workouts] =
+        await Promise.all([
+          workoutService.getStats(7),
+          mealService.getToday(),
+          weightService.getProgress(),
+          goalService.getAll("active"),
+          workoutService.getAll({ limit: 5 }),
+        ]);
 
       setData({
         workoutStats,
@@ -46,36 +66,44 @@ const Dashboard = () => {
         weightProgress,
         activeGoals: goals.slice(0, 3),
         recentWorkouts: workouts.workouts || [],
-      })
+      });
     } catch (error) {
-      console.error("Failed to fetch dashboard data:", error)
+      console.error("Failed to fetch dashboard data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
-  const { workoutStats, todayMeals, weightProgress, activeGoals, recentWorkouts } = data
+  const {
+    workoutStats,
+    todayMeals,
+    weightProgress,
+    activeGoals,
+    recentWorkouts,
+  } = data;
 
   // Prepare weight chart data
   const weightChartData =
     weightProgress?.history?.slice(-14).map((log) => ({
       date: formatDate(log.date, { month: "short", day: "numeric" }),
       weight: log.weight,
-    })) || []
+    })) || [];
 
   return (
     <div className="space-y-6">
       {/* Header */}
       <div>
-        <h1 className="text-2xl font-bold text-primary">Welcome back, {user?.name?.split(" ")[0]}</h1>
+        <h1 className="text-2xl font-bold text-primary">
+          Welcome back, {user?.name?.split(" ")[0]}
+        </h1>
         <p className="text-muted">Here's your fitness overview for today</p>
       </div>
 
@@ -87,7 +115,9 @@ const Dashboard = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Workouts (7d)</p>
-            <p className="text-2xl font-bold text-primary">{workoutStats?.totalWorkouts || 0}</p>
+            <p className="text-2xl font-bold text-primary">
+              {workoutStats?.totalWorkouts || 0}
+            </p>
           </div>
         </Card>
 
@@ -97,7 +127,9 @@ const Dashboard = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Calories Burned</p>
-            <p className="text-2xl font-bold text-primary">{formatNumber(workoutStats?.totalCalories || 0)}</p>
+            <p className="text-2xl font-bold text-primary">
+              {formatNumber(workoutStats?.totalCalories || 0)}
+            </p>
           </div>
         </Card>
 
@@ -107,7 +139,9 @@ const Dashboard = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Today's Calories</p>
-            <p className="text-2xl font-bold text-primary">{formatNumber(todayMeals?.totals?.calories || 0)}</p>
+            <p className="text-2xl font-bold text-primary">
+              {formatNumber(todayMeals?.totals?.calories || 0)}
+            </p>
           </div>
         </Card>
 
@@ -119,13 +153,23 @@ const Dashboard = () => {
             <p className="text-sm text-muted">Current Weight</p>
             <div className="flex items-center gap-2">
               <p className="text-2xl font-bold text-primary">
-                {weightProgress?.currentWeight ? `${weightProgress.currentWeight} kg` : "N/A"}
+                {weightProgress?.currentWeight
+                  ? `${weightProgress.currentWeight} kg`
+                  : "N/A"}
               </p>
               {weightProgress?.change !== 0 && (
                 <span
-                  className={`flex items-center text-sm ${weightProgress?.change < 0 ? "text-green-600" : "text-red-600"}`}
+                  className={`flex items-center text-sm ${
+                    weightProgress?.change < 0
+                      ? "text-green-600"
+                      : "text-red-600"
+                  }`}
                 >
-                  {weightProgress?.change < 0 ? <TrendingDown size={16} /> : <TrendingUp size={16} />}
+                  {weightProgress?.change < 0 ? (
+                    <TrendingDown size={16} />
+                  ) : (
+                    <TrendingUp size={16} />
+                  )}
                   {Math.abs(weightProgress?.change || 0).toFixed(1)}
                 </span>
               )}
@@ -154,7 +198,11 @@ const Dashboard = () => {
                 <ResponsiveContainer width="100%" height="100%">
                   <LineChart data={weightChartData}>
                     <CartesianGrid strokeDasharray="3 3" stroke="#e5e5e5" />
-                    <XAxis dataKey="date" tick={{ fontSize: 12 }} stroke="#737373" />
+                    <XAxis
+                      dataKey="date"
+                      tick={{ fontSize: 12 }}
+                      stroke="#737373"
+                    />
                     <YAxis
                       domain={["dataMin - 1", "dataMax + 1"]}
                       tick={{ fontSize: 12 }}
@@ -203,28 +251,42 @@ const Dashboard = () => {
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted">Calories</span>
-                  <span className="font-medium">{todayMeals?.totals?.calories || 0} / 2000 kcal</span>
+                  <span className="font-medium">
+                    {todayMeals?.totals?.calories || 0} / 2000 kcal
+                  </span>
                 </div>
-                <ProgressBar value={todayMeals?.totals?.calories || 0} max={2000} />
+                <ProgressBar
+                  value={todayMeals?.totals?.calories || 0}
+                  max={2000}
+                />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted">Protein</span>
-                  <span className="font-medium">{todayMeals?.totals?.protein || 0} / 150 g</span>
+                  <span className="font-medium">
+                    {todayMeals?.totals?.protein || 0} / 150 g
+                  </span>
                 </div>
-                <ProgressBar value={todayMeals?.totals?.protein || 0} max={150} />
+                <ProgressBar
+                  value={todayMeals?.totals?.protein || 0}
+                  max={150}
+                />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted">Carbs</span>
-                  <span className="font-medium">{todayMeals?.totals?.carbs || 0} / 250 g</span>
+                  <span className="font-medium">
+                    {todayMeals?.totals?.carbs || 0} / 250 g
+                  </span>
                 </div>
                 <ProgressBar value={todayMeals?.totals?.carbs || 0} max={250} />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted">Fat</span>
-                  <span className="font-medium">{todayMeals?.totals?.fat || 0} / 65 g</span>
+                  <span className="font-medium">
+                    {todayMeals?.totals?.fat || 0} / 65 g
+                  </span>
                 </div>
                 <ProgressBar value={todayMeals?.totals?.fat || 0} max={65} />
               </div>
@@ -261,13 +323,21 @@ const Dashboard = () => {
                         <Activity className="text-white" size={20} />
                       </div>
                       <div>
-                        <p className="font-medium text-primary">{workout.name}</p>
-                        <p className="text-sm text-muted">{formatDate(workout.date)}</p>
+                        <p className="font-medium text-primary">
+                          {workout.name}
+                        </p>
+                        <p className="text-sm text-muted">
+                          {formatDate(workout.date)}
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="font-medium text-primary">{workout.totalDuration} min</p>
-                      <p className="text-sm text-muted">{workout.totalCaloriesBurned} kcal</p>
+                      <p className="font-medium text-primary">
+                        {workout.totalDuration} min
+                      </p>
+                      <p className="text-sm text-muted">
+                        {workout.totalCaloriesBurned} kcal
+                      </p>
                     </div>
                   </Link>
                 ))}
@@ -276,7 +346,11 @@ const Dashboard = () => {
               <div className="text-center py-8 text-muted">
                 <p>No workouts logged yet</p>
                 <Link to="/workouts">
-                  <Button variant="outline" size="sm" className="mt-2 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 bg-transparent"
+                  >
                     Log Your First Workout
                   </Button>
                 </Link>
@@ -307,11 +381,20 @@ const Dashboard = () => {
                         <Target size={16} className="text-primary" />
                         <p className="font-medium text-primary">{goal.title}</p>
                       </div>
-                      <Badge variant={goal.progress >= 100 ? "success" : "default"}>
-                        {calculatePercentage(goal.currentValue, goal.targetValue)}%
+                      <Badge
+                        variant={goal.progress >= 100 ? "success" : "default"}
+                      >
+                        {calculatePercentage(
+                          goal.currentValue,
+                          goal.targetValue
+                        )}
+                        %
                       </Badge>
                     </div>
-                    <ProgressBar value={goal.currentValue} max={goal.targetValue} />
+                    <ProgressBar
+                      value={goal.currentValue}
+                      max={goal.targetValue}
+                    />
                     <div className="flex justify-between text-sm text-muted mt-1">
                       <span>
                         {goal.currentValue} / {goal.targetValue} {goal.unit}
@@ -325,7 +408,11 @@ const Dashboard = () => {
               <div className="text-center py-8 text-muted">
                 <p>No active goals</p>
                 <Link to="/goals">
-                  <Button variant="outline" size="sm" className="mt-2 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 bg-transparent"
+                  >
                     Set Your First Goal
                   </Button>
                 </Link>
@@ -335,7 +422,7 @@ const Dashboard = () => {
         </Card>
       </div>
     </div>
-  )
-}
+  );
+};
 
-export default Dashboard
+export default Dashboard;

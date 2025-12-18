@@ -1,45 +1,46 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Users, ClipboardList, Activity, ChevronRight } from "lucide-react"
-import Card from "../../components/ui/Card"
-import Button from "../../components/ui/Button"
-import Badge from "../../components/ui/Badge"
-import { useAuth } from "../../context/AuthContext"
-import { trainerService } from "../../services/trainer"
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Users, ClipboardList, Activity, ChevronRight } from "lucide-react";
+import Card from "../../components/ui/Card";
+import Button from "../../components/ui/Button";
+import Badge from "../../components/ui/Badge";
+import { useAuth } from "../../context/AuthContext";
+import { trainerService } from "../../services/trainer";
 
 const TrainerDashboard = () => {
-  const { user } = useAuth()
-  const [loading, setLoading] = useState(true)
-  const [clients, setClients] = useState([])
-  const [plans, setPlans] = useState([])
+  const { user } = useAuth();
+  const [loading, setLoading] = useState(true);
+  const [clients, setClients] = useState([]);
+  const [plans, setPlans] = useState([]);
 
   useEffect(() => {
-    fetchData()
-  }, [])
+    fetchData();
+  }, []);
 
   const fetchData = async () => {
     try {
-      const [clientsData, plansData] = await Promise.all([trainerService.getClients(), trainerService.getPlans()])
+      const [clientsData, plansData] = await Promise.all([
+        trainerService.getClients(),
+        trainerService.getPlans(),
+      ]);
 
-      setClients(clientsData || [])
-      setPlans(plansData || [])
+      setClients(clientsData || []);
+      setPlans(plansData || []);
     } catch (error) {
-      console.error("Failed to fetch trainer data:", error)
+      console.error("Failed to fetch trainer data:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
-  const activePlans = plans.filter((p) => p.status === "active")
+  const activePlans = plans.filter((p) => p.status === "active");
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -68,7 +69,9 @@ const TrainerDashboard = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Active Plans</p>
-            <p className="text-2xl font-bold text-primary">{activePlans.length}</p>
+            <p className="text-2xl font-bold text-primary">
+              {activePlans.length}
+            </p>
           </div>
         </Card>
 
@@ -88,7 +91,9 @@ const TrainerDashboard = () => {
           </div>
           <div>
             <p className="text-sm text-muted">Welcome</p>
-            <p className="text-lg font-bold text-primary">{user?.name?.split(" ")[0]}</p>
+            <p className="text-lg font-bold text-primary">
+              {user?.name?.split(" ")[0]}
+            </p>
           </div>
         </Card>
       </div>
@@ -121,7 +126,9 @@ const TrainerDashboard = () => {
                         {client.name?.charAt(0).toUpperCase()}
                       </div>
                       <div>
-                        <p className="font-medium text-primary">{client.name}</p>
+                        <p className="font-medium text-primary">
+                          {client.name}
+                        </p>
                         <p className="text-sm text-muted">{client.email}</p>
                       </div>
                     </div>
@@ -165,7 +172,9 @@ const TrainerDashboard = () => {
                       </div>
                       <div>
                         <p className="font-medium text-primary">{plan.name}</p>
-                        <p className="text-sm text-muted">For: {plan.client?.name || "Unknown"}</p>
+                        <p className="text-sm text-muted">
+                          For: {plan.client?.name || "Unknown"}
+                        </p>
                       </div>
                     </div>
                     <Badge variant="success">Active</Badge>
@@ -177,7 +186,11 @@ const TrainerDashboard = () => {
                 <ClipboardList size={40} className="mx-auto mb-2 opacity-50" />
                 <p>No active plans</p>
                 <Link to="/trainer/plans">
-                  <Button variant="outline" size="sm" className="mt-2 bg-transparent">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    className="mt-2 bg-transparent"
+                  >
                     Create Plan
                   </Button>
                 </Link>
@@ -210,7 +223,7 @@ const TrainerDashboard = () => {
         </Card.Content>
       </Card>
     </div>
-  )
-}
+  );
+};
 
-export default TrainerDashboard
+export default TrainerDashboard;

@@ -1,46 +1,44 @@
-"use client"
-
-import { useState, useEffect } from "react"
-import { Link } from "react-router-dom"
-import { Users, Search, ChevronRight, Mail, Activity } from "lucide-react"
-import Card from "../../components/ui/Card"
-import Input from "../../components/ui/Input"
-import EmptyState from "../../components/ui/EmptyState"
-import { trainerService } from "../../services/trainer"
-import { formatDate } from "../../utils/helpers"
+import { useState, useEffect } from "react";
+import { Link } from "react-router-dom";
+import { Users, Search, ChevronRight, Mail, Activity } from "lucide-react";
+import Card from "../../components/ui/Card";
+import Input from "../../components/ui/Input";
+import EmptyState from "../../components/ui/EmptyState";
+import { trainerService } from "../../services/trainer";
+import { formatDate } from "../../utils/helpers";
 
 const Clients = () => {
-  const [clients, setClients] = useState([])
-  const [loading, setLoading] = useState(true)
-  const [searchTerm, setSearchTerm] = useState("")
+  const [clients, setClients] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [searchTerm, setSearchTerm] = useState("");
 
   useEffect(() => {
-    fetchClients()
-  }, [])
+    fetchClients();
+  }, []);
 
   const fetchClients = async () => {
     try {
-      const data = await trainerService.getClients()
-      setClients(data || [])
+      const data = await trainerService.getClients();
+      setClients(data || []);
     } catch (error) {
-      console.error("Failed to fetch clients:", error)
+      console.error("Failed to fetch clients:", error);
     } finally {
-      setLoading(false)
+      setLoading(false);
     }
-  }
+  };
 
   const filteredClients = clients.filter(
     (client) =>
       client.name?.toLowerCase().includes(searchTerm.toLowerCase()) ||
-      client.email?.toLowerCase().includes(searchTerm.toLowerCase()),
-  )
+      client.email?.toLowerCase().includes(searchTerm.toLowerCase())
+  );
 
   if (loading) {
     return (
       <div className="flex items-center justify-center h-64">
         <div className="animate-spin rounded-full h-8 w-8 border-b-2 border-primary"></div>
       </div>
-    )
+    );
   }
 
   return (
@@ -53,7 +51,10 @@ const Clients = () => {
 
       {/* Search */}
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 text-muted" size={20} />
+        <Search
+          className="absolute left-3 top-1/2 -translate-y-1/2 text-muted"
+          size={20}
+        />
         <Input
           type="text"
           placeholder="Search clients..."
@@ -74,15 +75,23 @@ const Clients = () => {
                     {client.name?.charAt(0).toUpperCase()}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <h3 className="font-semibold text-primary truncate">{client.name}</h3>
+                    <h3 className="font-semibold text-primary truncate">
+                      {client.name}
+                    </h3>
                     <div className="flex items-center gap-2 text-sm text-muted mt-1">
                       <Mail size={14} />
                       <span className="truncate">{client.email}</span>
                     </div>
                     {client.profile && (
                       <div className="flex items-center gap-3 text-sm text-muted mt-2">
-                        {client.profile.age && <span>{client.profile.age} years</span>}
-                        {client.profile.gender && <span className="capitalize">{client.profile.gender}</span>}
+                        {client.profile.age && (
+                          <span>{client.profile.age} years</span>
+                        )}
+                        {client.profile.gender && (
+                          <span className="capitalize">
+                            {client.profile.gender}
+                          </span>
+                        )}
                       </div>
                     )}
                     <div className="flex items-center gap-2 text-sm text-muted mt-2">
@@ -101,12 +110,14 @@ const Clients = () => {
           icon={Users}
           title={searchTerm ? "No clients found" : "No clients assigned"}
           description={
-            searchTerm ? "Try a different search term" : "When users are assigned to you, they will appear here"
+            searchTerm
+              ? "Try a different search term"
+              : "When users are assigned to you, they will appear here"
           }
         />
       )}
     </div>
-  )
-}
+  );
+};
 
-export default Clients
+export default Clients;
